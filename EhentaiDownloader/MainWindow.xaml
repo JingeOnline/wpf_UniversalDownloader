@@ -1,0 +1,122 @@
+﻿<Window x:Class="EhentaiDownloader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EhentaiDownloader"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <SolidColorBrush x:Key="ThemeColor" Color="DodgerBlue"/>
+        <Style TargetType="Button" x:Key="ThemeButton">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Background" Value="{StaticResource ThemeColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Set">
+                <MenuItem Header="TimeOut" Click="MenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="8" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="32" Text="E-Hentai" HorizontalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource ThemeColor}"/>
+            <DockPanel Grid.Row="1">
+                <Button Style="{StaticResource ThemeButton}" Content="Add" DockPanel.Dock="Right" Width="64" VerticalAlignment="Center"
+                        x:Name="Button_Add" Click="Button_Add_Click"/>
+                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}"/>
+            </DockPanel>
+            <DataGrid Grid.Row="2" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn >
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="Remove" FontWeight="Bold"/>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button FontSize="18" FontFamily="Segoe MDL2 Assets" Content="&#xE107;" HorizontalAlignment="Stretch"
+                                           x:Name="Button_RemoveFromList" Background="SandyBrown" Foreground="White" Click="Button_RemoveFromList_Click"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn  Binding="{Binding Status}" Width="*" >
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Status" FontWeight="Bold"/>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Url}" Width="*">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Url" FontWeight="Bold"/>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn  Binding="{Binding Files,Mode=OneWay}" Width="*">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Files" FontWeight="Bold"/>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Width="*">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="Progress" FontWeight="Bold"/>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar HorizontalAlignment="Stretch" Value="{Binding Progress,Mode=OneWay}" Maximum="1" 
+                                             Visibility="{Binding Path=ShowProgressBar,Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Grid Grid.Row="3">
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource ThemeButton}" Content="Save To" Width="88" Margin="0,0,8,0"
+                            x:Name="Button_SaveTo" Click="Button_SaveTo_Click" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding SaveFolder,Mode=OneWay}" FontSize="18" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button Style="{StaticResource ThemeButton}" Content="Start" HorizontalAlignment="Right" Width="88"
+                        x:Name="Button_Start" Click="Button_Start_Click" VerticalAlignment="Center"/>
+            </Grid>
+        </Grid>
+        <Grid Margin="0,0,0,0" Background="LightGray" Grid.Row="2" Height="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock FontSize="14" VerticalAlignment="Center" >
+                <Run Text="Image Download: "/>
+                <Run Text="{Binding ImageDownloadCount,Mode=OneWay}"/>
+            </TextBlock>
+            <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="1">
+                <Run Text="Image Fails: "/>
+                <Run Text="{Binding ImageDownloadFailCount,Mode=OneWay}"/>
+            </TextBlock>
+        </Grid>
+    </Grid>
+
+</Window>

@@ -1,0 +1,17 @@
+﻿<Window x:Class="Test1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Test1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="{Binding Number,Mode=OneWay}" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button x:Name="Button_Add" Content="Add" Click="Button_Add_Click"/>
+            <Button x:Name="Button_AddInOtherClass" Content="Add In Other Class" Click="Button_AddInOtherClass_Click"/>
+            <Button x:Name="Button_ShowListCount" Content="Show List Count" Click="Button_ShowListCount_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

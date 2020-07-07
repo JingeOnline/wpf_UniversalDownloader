@@ -1,0 +1,28 @@
+﻿<Window x:Class="EhentaiDownloader.Views.Window_FinishResult"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EhentaiDownloader.Views"
+        mc:Ignorable="d"
+        Title="Window_FinishResult" Height="450" Width="800">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Download Finish" FontSize="32" HorizontalAlignment="Center"/>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding ImageList,Mode=OneWay}" AutoGenerateColumns="True"/>
+        <Grid Grid.Row="2" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="ReTry" x:Name="Button_ReTry" FontSize="18" Margin="4,0"
+                    Click="Button_ReTry_Click"/>
+            <Button Content="Close" x:Name="Button_Cancel" FontSize="18" Grid.Column="1" Margin="4,0"
+                    Click="Button_Cancel_Click"/>
+        </Grid>
+    </Grid>
+</Window>
