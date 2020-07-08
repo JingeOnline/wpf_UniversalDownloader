@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using EhentaiDownloader.Delegates;
 using EhentaiDownloader.Models;
+using EhentaiDownloader.Parsers;
 using EhentaiDownloader.Tools;
 using EhentaiDownloader.Views;
 using Microsoft.WindowsAPICodePack.Shell.Interop;
@@ -27,11 +28,14 @@ namespace EhentaiDownloader.Services
         public static Action<int> SetImageDownloadCount_Delegate;
         //设置UI上的ImageDownloadFailCount
         public static Action<int> SetImageDownloadFailCount_Delegate;
-        private static Func<string, Task<List<string>>> func_findImagePageUrl;
-        private static Func<string, Task<ImageModel>> func_findImageUrl;
+        //private static Func<string, Task<List<string>>> func_findImagePageUrl;
+        //private static Func<string, Task<ImageModel>> func_findImageUrl;
+        private static IWebpageParser webpageParser;
 
         public static async Task StartDownload(ObservableCollection<TaskItem> taskItems)
         {
+            DownloadFails.Clear();
+            DownloadFinish.Clear();
             for (int i = 0; i < taskItems.Count; i++)
             {
                 taskItems[i].Status = "Downloading";
@@ -40,29 +44,21 @@ namespace EhentaiDownloader.Services
                 taskItems[i].Status = "Download Finish";
             }
             new Window_FinishResult().Show();
-
-            //await test();
         }
-
-        //private static async Task test()
-        //{
-        //    string link = "https://asmhentai.com/gallery/305541/181/";
-        //    await findImageUrlInPageAndSaveToFile_AsmHentai(link);
-        //    Debug.WriteLine("Test Finish");
-        //}
-
-
+        /// <summary>
+        /// 下载一个TaskItem，根据传入的Url自动匹配解析器
+        /// </summary>
+        /// <param name="taskItem"></param>
+        /// <returns></returns>
         private static async Task downloadATask(TaskItem taskItem)
         {
             if (taskItem.Url.Contains("e-hentai.org"))
             {
-                func_findImagePageUrl = (url) => EHentaiParser.FindImagePageLink(url);
-                func_findImageUrl = (url) => EHentaiParser.FindImageUrl(url);
+                webpageParser = new EHentaiParser();
             }
             else if (taskItem.Url.Contains("asmhentai.com"))
             {
-                func_findImagePageUrl = (url) => AsmHentaiParser.FindImagePageLink(url);
-                func_findImageUrl = (url) => AsmHentaiParser.FindImageUrl(url);
+                webpageParser = new AsmHentaiParser();
             }
             else
             {
@@ -70,12 +66,22 @@ namespace EhentaiDownloader.Services
                 return;
             }
 
-            List<string> imagePageUrls = await func_findImagePageUrl(taskItem.Url);
+            List<string> imagePageUrls = await webpageParser.FindImagePageUrl(taskItem.Url);
             taskItem.NumberOfFiles = imagePageUrls.Count();
+            if (imagePageUrls.Count() == 0)
+            {
+                taskItem.Status = "No ImagePage Found";
+            }
             Debug.WriteLine("成功：" + "共找到Image页面:" + imagePageUrls.Count());
             await downloadFromImagePageParallel(imagePageUrls, taskItem);
         }
 
+        /// <summary>
+        /// 从网页中查找图片链接并下载到本地（异步）
+        /// </summary>
+        /// <param name="imagePageUrls">一组网页的Url</param>
+        /// <param name="taskItem">该组网页所属的TaskItem</param>
+        /// <returns>Task</returns>
         private static async Task downloadFromImagePageParallel(List<string> imagePageUrls, TaskItem taskItem = null)
         {
             List<Task> taskList = new List<Task>();
@@ -89,11 +95,12 @@ namespace EhentaiDownloader.Services
                     ImageModel imageModel = new ImageModel { ImageName = "未找到图片链接" };
                     try
                     {
-                        imageModel = await func_findImageUrl.Invoke(url);
+                        imageModel = await webpageParser.FindImageUrl(url);
                         await downloadAImageAndSave(imageModel);
                         if (taskItem != null)
                         {
                             taskItem.NumberOfFinish++;
+                            DownloadFinish.Add(imageModel);
                             SetImageDownloadCount_Delegate?.Invoke(DownloadFinish.Count());
                         }
                     }
@@ -112,38 +119,43 @@ namespace EhentaiDownloader.Services
             await Task.WhenAll(taskList);
         }
 
-
-        private static async Task downloadAImageAndSave(ImageModel image)
+        /// <summary>
+        /// 下载一个ImageModel并写入到本地(异步)
+        /// </summary>
+        /// <param name="imageModel"></param>
+        /// <returns>Task</returns>
+        private static async Task downloadAImageAndSave(ImageModel imageModel)
         {
             try
             {
-                if (image.ImageUrl != null)
+                if (imageModel.ImageUrl != null)
                 {
-                    Byte[] imageBytes = await HttpDownloader.DownloadBytes(image.ImageUrl);
-                    FileWriter.WriteToFile(imageBytes, image.ImageSavePath);
+                    Byte[] imageBytes = await HttpDownloader.DownloadBytes(imageModel.ImageUrl);
+                    FileWriter.WriteToFile(imageBytes, imageModel.ImageSavePath);
                 }
             }
             catch (TaskCanceledException e)
             {
-                Debug.WriteLine("失败：" + "下载二进制文件超时。" + image.ImageUrl);
+                Debug.WriteLine("失败：" + "下载二进制文件超时。" + imageModel.ImageUrl);
                 throw e;
             }
             catch (Exception e)
             {
-                Debug.WriteLine("失败：" + image.ImageUrl + " 下载失败，原因：" + e.Message);
+                Debug.WriteLine("失败：" + imageModel.ImageUrl + " 下载失败，原因：" + e.Message);
                 throw e;
             }
         }
 
+        /// <summary>
+        /// 下载结束后重新尝试下载失败的图片（异步）
+        /// </summary>
+        /// <returns>Task</returns>
         public static async Task ReTry()
         {
             Debug.WriteLine("成功：" + "开始Retry");
             List<string> failsPages = new List<string>();
-            //DownloadFails.ForEach(i => fails.Add(i));
-            foreach (ImageModel image in DownloadFails)
-            {
-                failsPages.Add(image.ImagePageUrl);
-            }
+            DownloadFails.ForEach(i => failsPages.Add(i.ImagePageUrl));
+
             DownloadFails.Clear();
             await downloadFromImagePageParallel(failsPages);
             new Window_FinishResult().Show();

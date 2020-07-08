@@ -34,7 +34,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Menu>
-            <MenuItem Header="Set">
+            <MenuItem Header="Setting">
                 <MenuItem Header="TimeOut" Click="MenuItem_Click"/>
             </MenuItem>
         </Menu>
@@ -56,7 +56,7 @@
                 <DataGrid.Columns>
                     <DataGridTemplateColumn >
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Remove" FontWeight="Bold"/>
+                            <TextBlock Text="Remove" FontWeight="Bold" />
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -67,27 +67,28 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn  Binding="{Binding Status}" Width="*" >
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="Status" FontWeight="Bold"/>
+                            <TextBlock Text="Status" FontWeight="Bold" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn Binding="{Binding Url}" Width="*">
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="Url" FontWeight="Bold"/>
+                            <TextBlock Text="Url" FontWeight="Bold" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn  Binding="{Binding Files,Mode=OneWay}" Width="*">
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="Files" FontWeight="Bold"/>
+                            <TextBlock Text="Files" FontWeight="Bold" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTemplateColumn Width="*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Progress" FontWeight="Bold"/>
+                            <TextBlock Text="Progress" FontWeight="Bold" />
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ProgressBar HorizontalAlignment="Stretch" Value="{Binding Progress,Mode=OneWay}" Maximum="1" 
-                                             Visibility="{Binding Path=ShowProgressBar,Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                             Visibility="{Binding Path=ShowProgressBar,Converter={StaticResource BooleanToVisibilityConverter}}"
+                                             Height="24"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

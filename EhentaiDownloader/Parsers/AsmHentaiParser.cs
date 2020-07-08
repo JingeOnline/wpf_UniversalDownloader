@@ -9,19 +9,20 @@ using AngleSharp;
 using AngleSharp.Dom;
 using EhentaiDownloader.Delegates;
 using EhentaiDownloader.Models;
+using EhentaiDownloader.Parsers;
 
 namespace EhentaiDownloader.Tools
 {
-    class AsmHentaiParser
+    class AsmHentaiParser: IWebpageParser
     {
         //private static string albumTitle;
         private static string saveFolderPath;
         private static void setSaveFolderPath()
         {
-            saveFolderPath = DelegateCommands.GetFolderPath.Invoke();
+            saveFolderPath = DelegateCommands.GetFolderPath?.Invoke();
         }
 
-        public async static Task<List<string>> FindImagePageLink(string url)
+        public async Task<List<string>> FindImagePageUrl(string url)
         {
             
             if (url[url.Length - 1] != '#')
@@ -45,7 +46,7 @@ namespace EhentaiDownloader.Tools
             return imagePageUrls.Select(link => "https://asmhentai.com" + link).ToList();
         }
 
-        public async static Task<ImageModel> FindImageUrl(string url)
+        public async Task<ImageModel> FindImageUrl(string url)
         {
             setSaveFolderPath();
             string html = await HttpDownloader.DownloadHtmlPage(url);
@@ -75,11 +76,8 @@ namespace EhentaiDownloader.Tools
 
             var nameResult = document.All.Where(m => m.LocalName == "title");
             string imageName = nameResult.First().Text();
-            Char[] unSafeChars = { '*', '.', '\\', '/', '|', '\"', '|', '?', '<', '>' };
-            foreach (char c in unSafeChars)
-            {
-                imageName = imageName.Replace(c, '_');
-            }
+
+            imageName = FileWriter.FileNameCheck(imageName);
             ImageModel image = new ImageModel
             {
                 ImageName = imageName,

@@ -8,22 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using AngleSharp;
+using AngleSharp.Browser;
 using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 using EhentaiDownloader.Delegates;
 using EhentaiDownloader.Models;
+using EhentaiDownloader.Parsers;
 
 namespace EhentaiDownloader.Tools
 {
-    class EHentaiParser
+    class EHentaiParser:IWebpageParser
     {
-        private static string albumTitle;
+        //private static string albumTitle;
         private static string saveFolderPath;
         private static void setSaveFolderPath()
         {
-            saveFolderPath = DelegateCommands.GetFolderPath.Invoke();
+            saveFolderPath = DelegateCommands.GetFolderPath?.Invoke();
         }
 
-        public async static Task<List<string>> FindImagePageLink(string url)
+        public async  Task<List<string>> FindImagePageUrl(string url)
         {
             string html = await HttpDownloader.DownloadHtmlPage(url);
             ParseResult result = await findNextPageLinkAndCurrentImagePages(html);
@@ -31,7 +34,7 @@ namespace EhentaiDownloader.Tools
             imagePageList.AddRange(result.ImagePageList);
             if (result.NextPage != null)
             {
-                imagePageList.AddRange(await FindImagePageLink(result.NextPage));
+                imagePageList.AddRange(await FindImagePageUrl(result.NextPage));
             }
             return imagePageList;
         }
@@ -43,7 +46,7 @@ namespace EhentaiDownloader.Tools
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             IEnumerable<IElement> result = document.All.Where(m=>m.LocalName=="a" && m.Text()==">");
-            findAlbumTitle();
+            //findAlbumTitle();
             int a = result.Count();
             Debug.WriteLine("a=" + a);
             if (result.Count() > 0)
@@ -59,17 +62,17 @@ namespace EhentaiDownloader.Tools
                 return new ParseResult {NextPage=null,ImagePageList=findImagePageLink() };
             }
 
-            void findAlbumTitle()
-            {
-                IEnumerable<IElement> titleElement = document.All.Where(m => m.LocalName == "h1" && m.Id == "gn");
-                albumTitle = titleElement.First().Text();
-                Char[] unSafeChars= {'*','.','\\','/','|','\"','|','?','<','>'};
-                foreach(char c in unSafeChars)
-                {
-                    albumTitle=albumTitle.Replace(c, '_');
-                }
-                Debug.WriteLine("找到album title=" +albumTitle);
-            }
+            //void findAlbumTitle()
+            //{
+            //    IEnumerable<IElement> titleElement = document.All.Where(m => m.LocalName == "h1" && m.Id == "gn");
+            //    albumTitle = titleElement.First().Text();
+            //    Char[] unSafeChars= {'*','.','\\','/','|','\"','|','?','<','>'};
+            //    foreach(char c in unSafeChars)
+            //    {
+            //        albumTitle=albumTitle.Replace(c, '_');
+            //    }
+            //    Debug.WriteLine("找到album title=" +albumTitle);
+            //}
 
             List<string> findImagePageLink()
             {
@@ -87,7 +90,7 @@ namespace EhentaiDownloader.Tools
         }
 
 
-        public async static Task<ImageModel> FindImageUrl(string url)
+        public async  Task<ImageModel> FindImageUrl(string url)
         {
             setSaveFolderPath();
             string html = await HttpDownloader.DownloadHtmlPage(url);
@@ -97,19 +100,21 @@ namespace EhentaiDownloader.Tools
             IDocument document = await context.OpenAsync(response => response.Content(html));
             var urlResult = document.All.Where(m => m.LocalName == "img" && m.Id == "img");
             string imageUrl = urlResult.First().GetAttribute("src");
-            var nameResult = document.All.Where(m=>m.LocalName=="div" && m.ClassName=="sn");
-            string imageName = nameResult.First().QuerySelector("div").QuerySelector("span").Text();
-            Char[] unSafeChars = { '*', '.', '\\', '/', '|', '\"', '|', '?', '<', '>' };
-            foreach (char c in unSafeChars)
-            {
-                imageName = imageName.Replace(c, '_');
-            }
+
+            var imageNumResult = document.All.Where(m=>m.LocalName=="div" && m.ClassName=="sn");
+            string imageNum = imageNumResult.First().QuerySelector("div").QuerySelector("span").Text();
+
+            var titleResult = document.All.Where(m => m.LocalName == "div" && m.Id == "i1");
+            string title = titleResult.First().QuerySelector("h1").Text();
+
+            string imageName = title + "_" + imageNum;
+            imageName = FileWriter.FileNameCheck(imageName);
             ImageModel image = new ImageModel
             {
-                ImageName = albumTitle + "_" + imageName,
+                ImageName = imageName,
                 ImageUrl = imageUrl,
                 ImagePageUrl = url,
-                ImageSavePath = Path.Combine(saveFolderPath, albumTitle + "_" + imageName + ".jpg")
+                ImageSavePath = Path.Combine(saveFolderPath, imageName + ".jpg")
             };
             return image;
         }

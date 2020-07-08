@@ -80,9 +80,9 @@ namespace EhentaiDownloader
 
         private void Button_Start_Click(object sender, RoutedEventArgs e)
         {
-            DownloadService.StartDownload(DownloadTaskCollection);
             DownloadService.SetImageDownloadCount_Delegate = (x) => ImageDownloadCount = x;
             DownloadService.SetImageDownloadFailCount_Delegate = (x) => ImageDownloadFailCount = x;
+            DownloadService.StartDownload(DownloadTaskCollection);
         }
 
         private void Button_SaveTo_Click(object sender, RoutedEventArgs e)

@@ -23,7 +23,16 @@ namespace EhentaiDownloader.Tools
                 Debug.WriteLine("写入失败原因" + e.Message);
                 throw e;
             }
+        }
 
+        public static string FileNameCheck(string name)
+        {
+            Char[] unSafeChars = { '*', ':', '\\', '/', '|', '\"', '|', '?', '<', '>' };
+            foreach (char c in unSafeChars)
+            {
+                name = name.Replace(c, '_');
+            }
+            return name;
         }
     }
 }
