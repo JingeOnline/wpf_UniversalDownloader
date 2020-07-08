@@ -16,10 +16,10 @@ namespace EhentaiDownloader.Tools
     class AsmHentaiParser: IWebpageParser
     {
         //private static string albumTitle;
-        private static string saveFolderPath;
-        private static void setSaveFolderPath()
+        private string saveFolderPath;
+        private void setSaveFolderPath()
         {
-            saveFolderPath = DelegateCommands.GetFolderPath?.Invoke();
+            saveFolderPath = DelegateCommands.GetFolderPathCommand?.Invoke();
         }
 
         public async Task<List<string>> FindImagePageUrl(string url)

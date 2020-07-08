@@ -24,12 +24,6 @@ namespace EhentaiDownloader.Services
     {
         public static List<ImageModel> DownloadFails { get; set; } = new List<ImageModel>();
         public static List<ImageModel> DownloadFinish { get; set; } = new List<ImageModel>();
-        //设置UI上的ImageDownloadCount
-        public static Action<int> SetImageDownloadCount_Delegate;
-        //设置UI上的ImageDownloadFailCount
-        public static Action<int> SetImageDownloadFailCount_Delegate;
-        //private static Func<string, Task<List<string>>> func_findImagePageUrl;
-        //private static Func<string, Task<ImageModel>> func_findImageUrl;
         private static IWebpageParser webpageParser;
 
         public static async Task StartDownload(ObservableCollection<TaskItem> taskItems)
@@ -101,13 +95,13 @@ namespace EhentaiDownloader.Services
                         {
                             taskItem.NumberOfFinish++;
                             DownloadFinish.Add(imageModel);
-                            SetImageDownloadCount_Delegate?.Invoke(DownloadFinish.Count());
+                            DelegateCommands.SetImageDownloadCountCommand?.Invoke(DownloadFinish.Count());
                         }
                     }
                     catch (Exception e)
                     {
                         DownloadFails.Add(imageModel);
-                        SetImageDownloadFailCount_Delegate?.Invoke(DownloadFails.Count());
+                        DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFails.Count());
                     }
                     finally
                     {

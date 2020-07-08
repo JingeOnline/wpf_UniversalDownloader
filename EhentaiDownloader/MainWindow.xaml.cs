@@ -80,8 +80,6 @@ namespace EhentaiDownloader
 
         private void Button_Start_Click(object sender, RoutedEventArgs e)
         {
-            DownloadService.SetImageDownloadCount_Delegate = (x) => ImageDownloadCount = x;
-            DownloadService.SetImageDownloadFailCount_Delegate = (x) => ImageDownloadFailCount = x;
             DownloadService.StartDownload(DownloadTaskCollection);
         }
 
@@ -112,7 +110,9 @@ namespace EhentaiDownloader
         private void registerCommands()
         {
             DelegateCommands.ClearAllCommand = ClearAll;
-            DelegateCommands.GetFolderPath = () => SaveFolder;
+            DelegateCommands.GetFolderPathCommand = () => SaveFolder;
+            DelegateCommands.SetImageDownloadCountCommand= (x) => ImageDownloadCount = x;
+            DelegateCommands.SetImageDownloadFailCountCommand=(x)=>ImageDownloadFailCount=x;
         }
 
         private void Button_RemoveFromList_Click(object sender, RoutedEventArgs e)

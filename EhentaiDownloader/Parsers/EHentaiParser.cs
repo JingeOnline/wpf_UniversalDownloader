@@ -20,13 +20,13 @@ namespace EhentaiDownloader.Tools
     class EHentaiParser:IWebpageParser
     {
         //private static string albumTitle;
-        private static string saveFolderPath;
-        private static void setSaveFolderPath()
+        private string saveFolderPath;
+        private void setSaveFolderPath()
         {
-            saveFolderPath = DelegateCommands.GetFolderPath?.Invoke();
+            saveFolderPath = DelegateCommands.GetFolderPathCommand?.Invoke();
         }
 
-        public async  Task<List<string>> FindImagePageUrl(string url)
+        public async Task<List<string>> FindImagePageUrl(string url)
         {
             string html = await HttpDownloader.DownloadHtmlPage(url);
             ParseResult result = await findNextPageLinkAndCurrentImagePages(html);
@@ -39,7 +39,7 @@ namespace EhentaiDownloader.Tools
             return imagePageList;
         }
 
-        private async static Task<ParseResult> findNextPageLinkAndCurrentImagePages(string html)
+        private async Task<ParseResult> findNextPageLinkAndCurrentImagePages(string html)
         {
             Debug.WriteLine("开始Parse下一页的链接");
             IConfiguration config = Configuration.Default;
@@ -90,7 +90,7 @@ namespace EhentaiDownloader.Tools
         }
 
 
-        public async  Task<ImageModel> FindImageUrl(string url)
+        public async Task<ImageModel> FindImageUrl(string url)
         {
             setSaveFolderPath();
             string html = await HttpDownloader.DownloadHtmlPage(url);
