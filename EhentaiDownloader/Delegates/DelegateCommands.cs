@@ -15,5 +15,6 @@ namespace EhentaiDownloader.Delegates
         public static Func<string> GetFolderPathCommand { get; set; }
         public static Action<int> SetImageDownloadCountCommand { get; set; }
         public static Action<int> SetImageDownloadFailCountCommand { get; set; }
+        public static Action<long> AddImageDownloadSizeCommand { get; set; }
     }
 }

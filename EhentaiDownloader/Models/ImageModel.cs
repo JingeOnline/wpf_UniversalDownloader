@@ -25,5 +25,7 @@ namespace EhentaiDownloader.Models
         }
         public string ImagePageUrl { get; set; }
         public string ImageFileExtention { get; set; }
+
+        public TaskItem taskItem { get; set; }
     }
 }

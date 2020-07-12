@@ -54,6 +54,24 @@ namespace EhentaiDownloader
             get { return _imageDownloadFailCount; }
             set { _imageDownloadFailCount = value; OnPropertyChanged(); }
         }
+        public long _imageDownloadSize=0;
+        public long ImageDownloadSize
+        {
+            get { return _imageDownloadSize; }
+            set { _imageDownloadSize = value;OnPropertyChanged(); OnPropertyChanged("ImageDownloadSizeUi"); }
+        }
+        public string ImageDownloadSizeUi
+        {
+            get 
+            {
+                if (ImageDownloadSize < 1024 * 1024) { return (ImageDownloadSize / 1024).ToString() + " KB"; }
+                if (ImageDownloadSize < 1024 * 1024 * 1024) { return (ImageDownloadSize / 1024 / 1024).ToString() + " MB"; }
+                else
+                {
+                    return (ImageDownloadSize / 1024 / 1024 / 1024).ToString() + " GB";
+                }
+            }
+        }
 
         public MainWindow()
         {
@@ -105,6 +123,7 @@ namespace EhentaiDownloader
             DownloadTaskCollection.Clear();
             ImageDownloadCount = 0;
             ImageDownloadFailCount = 0;
+            ImageDownloadSize = 0;
         }
 
         private void registerCommands()
@@ -113,6 +132,7 @@ namespace EhentaiDownloader
             DelegateCommands.GetFolderPathCommand = () => SaveFolder;
             DelegateCommands.SetImageDownloadCountCommand= (x) => ImageDownloadCount = x;
             DelegateCommands.SetImageDownloadFailCountCommand=(x)=>ImageDownloadFailCount=x;
+            DelegateCommands.AddImageDownloadSizeCommand = (x) => ImageDownloadSize += x;
         }
 
         private void Button_RemoveFromList_Click(object sender, RoutedEventArgs e)
