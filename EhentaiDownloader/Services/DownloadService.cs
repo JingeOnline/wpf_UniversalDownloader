@@ -54,6 +54,10 @@ namespace EhentaiDownloader.Services
             {
                 webpageParser = new AsmHentaiParser();
             }
+            else if (taskItem.Url.Contains("shzx.org"))
+            {
+                webpageParser = new ShzxParser();
+            }
             else
             {
                 taskItem.Status = "Invalid Url";

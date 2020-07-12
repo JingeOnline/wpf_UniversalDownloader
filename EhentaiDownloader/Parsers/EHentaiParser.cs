@@ -17,14 +17,9 @@ using EhentaiDownloader.Parsers;
 
 namespace EhentaiDownloader.Tools
 {
-    class EHentaiParser:IWebpageParser
+    class EHentaiParser : IWebpageParser
     {
         //private static string albumTitle;
-        private string saveFolderPath;
-        private void setSaveFolderPath()
-        {
-            saveFolderPath = DelegateCommands.GetFolderPathCommand?.Invoke();
-        }
 
         public async Task<List<string>> FindImagePageUrl(string url)
         {
@@ -45,13 +40,13 @@ namespace EhentaiDownloader.Tools
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
-            IEnumerable<IElement> result = document.All.Where(m=>m.LocalName=="a" && m.Text()==">");
+            IEnumerable<IElement> result = document.All.Where(m => m.LocalName == "a" && m.Text() == ">");
             //findAlbumTitle();
             int a = result.Count();
             Debug.WriteLine("a=" + a);
             if (result.Count() > 0)
             {
-                string nextPageLink= result.First().GetAttribute("href");
+                string nextPageLink = result.First().GetAttribute("href");
                 Debug.WriteLine("找到下一页链接" + nextPageLink);
                 //return nextPageLink;
                 return new ParseResult { NextPage = nextPageLink, ImagePageList = findImagePageLink() };
@@ -59,7 +54,7 @@ namespace EhentaiDownloader.Tools
             else
             {
                 Debug.WriteLine("未找到NextPage链接");
-                return new ParseResult {NextPage=null,ImagePageList=findImagePageLink() };
+                return new ParseResult { NextPage = null, ImagePageList = findImagePageLink() };
             }
 
             //void findAlbumTitle()
@@ -76,7 +71,7 @@ namespace EhentaiDownloader.Tools
 
             List<string> findImagePageLink()
             {
-                var results = document.All.Where(m => m.LocalName == "div" && m.ClassName == "gdtm");           
+                var results = document.All.Where(m => m.LocalName == "div" && m.ClassName == "gdtm");
                 List<string> imagePageUrls = new List<string>();
                 foreach (var res in results)
                 {
@@ -92,7 +87,7 @@ namespace EhentaiDownloader.Tools
 
         public async Task<ImageModel> FindImageUrl(string url)
         {
-            setSaveFolderPath();
+
             string html = await HttpDownloader.DownloadHtmlPage(url);
 
             IConfiguration config = Configuration.Default;
@@ -101,20 +96,19 @@ namespace EhentaiDownloader.Tools
             var urlResult = document.All.Where(m => m.LocalName == "img" && m.Id == "img");
             string imageUrl = urlResult.First().GetAttribute("src");
 
-            var imageNumResult = document.All.Where(m=>m.LocalName=="div" && m.ClassName=="sn");
+            var imageNumResult = document.All.Where(m => m.LocalName == "div" && m.ClassName == "sn");
             string imageNum = imageNumResult.First().QuerySelector("div").QuerySelector("span").Text();
 
             var titleResult = document.All.Where(m => m.LocalName == "div" && m.Id == "i1");
             string title = titleResult.First().QuerySelector("h1").Text();
-
             string imageName = title + "_" + imageNum;
-            imageName = FileWriter.FileNameCheck(imageName);
+
             ImageModel image = new ImageModel
             {
                 ImageName = imageName,
                 ImageUrl = imageUrl,
                 ImagePageUrl = url,
-                ImageSavePath = Path.Combine(saveFolderPath, imageName + ".jpg")
+                ImageFileExtention = "jpg",
             };
             return image;
         }

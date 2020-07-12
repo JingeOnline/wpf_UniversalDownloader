@@ -16,11 +16,6 @@ namespace EhentaiDownloader.Tools
     class AsmHentaiParser: IWebpageParser
     {
         //private static string albumTitle;
-        private string saveFolderPath;
-        private void setSaveFolderPath()
-        {
-            saveFolderPath = DelegateCommands.GetFolderPathCommand?.Invoke();
-        }
 
         public async Task<List<string>> FindImagePageUrl(string url)
         {
@@ -48,7 +43,6 @@ namespace EhentaiDownloader.Tools
 
         public async Task<ImageModel> FindImageUrl(string url)
         {
-            setSaveFolderPath();
             string html = await HttpDownloader.DownloadHtmlPage(url);
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
@@ -77,13 +71,12 @@ namespace EhentaiDownloader.Tools
             var nameResult = document.All.Where(m => m.LocalName == "title");
             string imageName = nameResult.First().Text();
 
-            imageName = FileWriter.FileNameCheck(imageName);
             ImageModel image = new ImageModel
             {
                 ImageName = imageName,
                 ImageUrl = imageUrl,
                 ImagePageUrl = url,
-                ImageSavePath = Path.Combine(saveFolderPath, imageName + ".jpg")
+                ImageFileExtention = "jpg",
             };
             return image;
         }
