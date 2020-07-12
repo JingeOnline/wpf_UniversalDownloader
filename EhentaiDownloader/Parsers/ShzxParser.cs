@@ -37,10 +37,10 @@ namespace EhentaiDownloader.Parsers
             return urls;
         }
 
-        public async Task<ImageModel> FindImageUrl(string url)
+        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
         {
 
-            string html = await HttpDownloader.DownloadHtmlPage(url);
+            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
             IBrowsingContext context = BrowsingContext.New();
             IDocument document = await context.OpenAsync(response => response.Content(html));
 
@@ -48,24 +48,17 @@ namespace EhentaiDownloader.Parsers
             string albumTitle = titleElement.InnerHtml;
 
             IElement urlElement = document.QuerySelector("div.picture").QuerySelector("img");
-            string imageUrl = urlElement.GetAttribute("src");
+            imageModel.ImageUrl = urlElement.GetAttribute("src");
 
             IElement pageNumElement = document.QuerySelector("div.paging");
             string pageNum = pageNumElement.QuerySelector("b").InnerHtml;
 
-            string imageName = albumTitle + "_" + pageNum;
+            imageModel.ImageName = albumTitle + "_" + pageNum;
 
-            string[] splitResult = imageUrl.Split('.');
-            string fileExtension = splitResult[splitResult.Length - 1];
+            string[] splitResult = imageModel.ImageUrl.Split('.');
+            imageModel.ImageFileExtention = splitResult[splitResult.Length - 1];
 
-            ImageModel image = new ImageModel
-            {
-                ImageName = imageName,
-                ImageUrl = imageUrl,
-                ImagePageUrl = url,
-                ImageFileExtention = fileExtension,
-            };
-            return image;
+            return imageModel;
         }
     }
 }

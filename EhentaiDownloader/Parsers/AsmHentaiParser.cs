@@ -41,14 +41,14 @@ namespace EhentaiDownloader.Tools
             return imagePageUrls.Select(link => "https://asmhentai.com" + link).ToList();
         }
 
-        public async Task<ImageModel> FindImageUrl(string url)
+        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
         {
-            string html = await HttpDownloader.DownloadHtmlPage(url);
+            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             IEnumerable<IElement> urlResult = document.All.Where(m => m.LocalName == "img" && m.ClassName == "lazy no_image");
-            string imageUrl;
+
             if (urlResult.Count() == 0)
             {
                 urlResult = document.All.Where(m => m.LocalName == "div" && m.ClassName == "image_1");
@@ -60,25 +60,19 @@ namespace EhentaiDownloader.Tools
                 }
                 else
                 {
-                    imageUrl = "https://" + urlResult.First().QuerySelector("img").GetAttribute("src").Remove(0, 2);
+                    imageModel.ImageUrl = "https://" + urlResult.First().QuerySelector("img").GetAttribute("src").Remove(0, 2);
                 }
             }
             else
             {
-                imageUrl = "https://" + urlResult.First().GetAttribute("src").Remove(0, 2);
+                imageModel.ImageUrl = "https://" + urlResult.First().GetAttribute("src").Remove(0, 2);
             }
 
             var nameResult = document.All.Where(m => m.LocalName == "title");
-            string imageName = nameResult.First().Text();
+            imageModel.ImageName = nameResult.First().Text();
+            imageModel.ImageFileExtention = "jpg";
 
-            ImageModel image = new ImageModel
-            {
-                ImageName = imageName,
-                ImageUrl = imageUrl,
-                ImagePageUrl = url,
-                ImageFileExtention = "jpg",
-            };
-            return image;
+            return imageModel;
         }
     }
 }

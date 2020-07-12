@@ -85,32 +85,26 @@ namespace EhentaiDownloader.Tools
         }
 
 
-        public async Task<ImageModel> FindImageUrl(string url)
+        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
         {
 
-            string html = await HttpDownloader.DownloadHtmlPage(url);
+            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
 
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             var urlResult = document.All.Where(m => m.LocalName == "img" && m.Id == "img");
-            string imageUrl = urlResult.First().GetAttribute("src");
+            imageModel.ImageUrl = urlResult.First().GetAttribute("src");
 
             var imageNumResult = document.All.Where(m => m.LocalName == "div" && m.ClassName == "sn");
             string imageNum = imageNumResult.First().QuerySelector("div").QuerySelector("span").Text();
 
             var titleResult = document.All.Where(m => m.LocalName == "div" && m.Id == "i1");
             string title = titleResult.First().QuerySelector("h1").Text();
-            string imageName = title + "_" + imageNum;
+            imageModel.ImageName = title + "_" + imageNum;
+            imageModel.ImageFileExtention = "jpg";
 
-            ImageModel image = new ImageModel
-            {
-                ImageName = imageName,
-                ImageUrl = imageUrl,
-                ImagePageUrl = url,
-                ImageFileExtention = "jpg",
-            };
-            return image;
+            return imageModel;
         }
 
     }
