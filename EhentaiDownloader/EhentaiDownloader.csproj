@@ -84,6 +84,7 @@
     <Compile Include="Parsers\EHentaiParser.cs" />
     <Compile Include="Tools\FileWriter.cs" />
     <Compile Include="Tools\HttpDownloader.cs" />
+    <Compile Include="Tools\SoundPlayer.cs" />
     <Compile Include="Views\Window_FinishResult.xaml.cs">
       <DependentUpon>Window_FinishResult.xaml</DependentUpon>
     </Compile>

@@ -34,11 +34,12 @@ namespace EhentaiDownloader.Services
             DownloadFinishImages.Clear();
             for (int i = 0; i < taskItems.Count; i++)
             {
-                taskItems[i].Status = "Downloading";
-                taskItems[i].NumberOfFinish = 0;
+                //taskItems[i].Status= "Downloading";
+                //taskItems[i].NumberOfFinish = 0;
                 await downloadATask(taskItems[i]);
-                taskItems[i].Status = "Download Finish";
+                //taskItems[i].Status = "Download Finish";
             }
+            SoundPlayer.PlayCompleteness();
             new Window_FinishResult().Show();
         }
         /// <summary>
@@ -48,6 +49,7 @@ namespace EhentaiDownloader.Services
         /// <returns></returns>
         private static async Task downloadATask(TaskItem taskItem)
         {
+            taskItem.Status = "Downloading";
             if (taskItem.Url.Contains("e-hentai.org"))
             {
                 webpageParser = new EHentaiParser();
@@ -72,9 +74,10 @@ namespace EhentaiDownloader.Services
                 taskItem.Status = "No ImagePage Found";
                 return;
             }
-            Debug.WriteLine("成功：" + "共找到Image页面:" + imagePages.Count());
+            Debug.WriteLine("成功：" + "共找到ImagePage页面:" + imagePages.Count());
             List<ImageModel> imageModels = await getAllImageUrls(imagePages);
             await downloadImagesParallel(imageModels);
+            taskItem.Status= "Download Finish";
         }
         
         /// <summary>
@@ -101,6 +104,7 @@ namespace EhentaiDownloader.Services
                     }
                     catch(Exception e)
                     {
+                        imagePage.FailMessage = e.Message;
                         UnAvailablePages.Add(imagePage);
                         Debug.WriteLine("getAllImageUrls("+imagePage.ImagePageUrl+")发生错误，" + e.Message);
                     }
@@ -196,6 +200,7 @@ namespace EhentaiDownloader.Services
             DownloadFailImages.Clear();
             DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFailImages.Count());
             await downloadImagesParallel(failsList);
+            SoundPlayer.PlayCompleteness();
             new Window_FinishResult().Show();
         }
     }

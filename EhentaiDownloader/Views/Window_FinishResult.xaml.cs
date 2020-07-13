@@ -69,5 +69,10 @@ namespace EhentaiDownloader.Views
             this.Close();
             DelegateCommands.ClearAllCommand?.Invoke();
         }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Button_Cancel_Click(this.Button_Cancel,null);
+        }
     }
 }

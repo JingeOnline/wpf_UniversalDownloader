@@ -10,6 +10,7 @@ namespace EhentaiDownloader.Models
     {
         public string ImagePageUrl { get; set; }
         public TaskItem TaskItem { get; set; }
+        public string FailMessage { get; set; }
 
         //public ImagePageModel(string imagePageUrl)
         //{
