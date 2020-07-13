@@ -17,11 +17,11 @@ namespace EhentaiDownloader.Parsers
     class ShzxParser : IWebpageParser
     {
         //static string albumTitle;
-        public async Task<List<string>> FindImagePageUrl(string url)
+        public async Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem)
         {
 
-            List<string> urls = new List<string>();
-            string html = await HttpDownloader.DownloadHtmlPage(url);
+            //List<string> urls = new List<string>();
+            string html = await HttpDownloader.DownloadHtmlPage(taskItem.Url);
             IBrowsingContext context = BrowsingContext.New();
             IDocument document = await context.OpenAsync(response => response.Content(html));
 
@@ -29,36 +29,58 @@ namespace EhentaiDownloader.Parsers
             string pageNumString = pageNumElement.QuerySelector("a").InnerHtml;
             Match matchNum = Regex.Match(pageNumString, "[0-9]+");
             int maxPageNum = Int32.Parse(matchNum.Value);
-            string generalUrl = url.Remove(url.Length - 6);
+            string generalUrl = taskItem.Url.Remove(taskItem.Url.Length - 6);
+            List<ImagePageModel> imagePageModels = new List<ImagePageModel>();
             for (int i = 0; i < maxPageNum; i++)
             {
-                urls.Add(generalUrl + i + ".html");
+                string url = generalUrl + i + ".html";
+                imagePageModels.Add(new ImagePageModel(url, taskItem));
             }
-            return urls;
+            return imagePageModels;
         }
 
-        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
+        public async Task<List<ImageModel>> FindImageUrls(ImagePageModel imagePageModel)
         {
 
-            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
+            string html = await HttpDownloader.DownloadHtmlPage(imagePageModel.ImagePageUrl);
             IBrowsingContext context = BrowsingContext.New();
             IDocument document = await context.OpenAsync(response => response.Content(html));
 
+            List<ImageModel> imageModels = new List<ImageModel>();
             IElement titleElement = document.QuerySelector("title");
             string albumTitle = titleElement.InnerHtml;
 
-            IElement urlElement = document.QuerySelector("div.picture").QuerySelector("img");
-            imageModel.ImageUrl = urlElement.GetAttribute("src");
+            IElement divElement = document.QuerySelector("div.picture");
+            var imageElements = divElement.QuerySelectorAll("img");
+            if (imageElements.Count() == 0)
+            {
+                Debug.WriteLine("在图片页面hmtl中没有匹配到图片url元素: "+imagePageModel.ImagePageUrl);
+                throw new Exception("在图片页面hmtl中没有匹配到图片url元素");
+            }
+            
 
             IElement pageNumElement = document.QuerySelector("div.paging");
             string pageNum = pageNumElement.QuerySelector("b").InnerHtml;
 
-            imageModel.ImageName = albumTitle + "_" + pageNum;
+            int index = 1;
+            foreach (IElement imgElement in imageElements)
+            {
+                string imageName;
+                string url = imgElement.GetAttribute("src");
+                if (index > 1)
+                {
+                    imageName = albumTitle + "_" + pageNum + "_" + index;
+                }
+                else
+                {
+                    imageName = albumTitle + "_" + pageNum;
+                }
+                ImageModel imageModel = new ImageModel(imagePageModel, imageName, url);
+                index++;
 
-            string[] splitResult = imageModel.ImageUrl.Split('.');
-            imageModel.ImageFileExtention = splitResult[splitResult.Length - 1];
-
-            return imageModel;
+                imageModels.Add(imageModel);
+            }
+            return imageModels;
         }
     }
 }

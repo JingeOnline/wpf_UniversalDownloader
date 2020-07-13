@@ -9,7 +9,7 @@ namespace EhentaiDownloader.Parsers
 {
     interface IWebpageParser
     {
-        Task<List<string>> FindImagePageUrl(string url);
-        Task<ImageModel> FindImageUrl(ImageModel imageModel);
+        Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem);
+        Task<List<ImageModel>> FindImageUrls(ImagePageModel imagePage);
     }
 }

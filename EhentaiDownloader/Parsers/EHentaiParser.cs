@@ -21,7 +21,18 @@ namespace EhentaiDownloader.Tools
     {
         //private static string albumTitle;
 
-        public async Task<List<string>> FindImagePageUrl(string url)
+        public async Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem)
+        {
+            List<string> imagePageUrlList =await findImagePageUrl(taskItem.Url);
+            List<ImagePageModel> imagePageModels = new List<ImagePageModel>();
+            foreach(string url in imagePageUrlList)
+            {
+                imagePageModels.Add(new ImagePageModel(url, taskItem));
+            }
+            return imagePageModels;
+        }
+
+        public async Task<List<string>> findImagePageUrl(string url)
         {
             string html = await HttpDownloader.DownloadHtmlPage(url);
             ParseResult result = await findNextPageLinkAndCurrentImagePages(html);
@@ -29,7 +40,7 @@ namespace EhentaiDownloader.Tools
             imagePageList.AddRange(result.ImagePageList);
             if (result.NextPage != null)
             {
-                imagePageList.AddRange(await FindImagePageUrl(result.NextPage));
+                imagePageList.AddRange(await findImagePageUrl(result.NextPage));
             }
             return imagePageList;
         }
@@ -85,26 +96,26 @@ namespace EhentaiDownloader.Tools
         }
 
 
-        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
+        public async Task<List<ImageModel>> FindImageUrls(ImagePageModel imagePageModel)
         {
 
-            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
+            string html = await HttpDownloader.DownloadHtmlPage(imagePageModel.ImagePageUrl);
 
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             var urlResult = document.All.Where(m => m.LocalName == "img" && m.Id == "img");
-            imageModel.ImageUrl = urlResult.First().GetAttribute("src");
+            string imageUrl = urlResult.First().GetAttribute("src");
 
             var imageNumResult = document.All.Where(m => m.LocalName == "div" && m.ClassName == "sn");
             string imageNum = imageNumResult.First().QuerySelector("div").QuerySelector("span").Text();
 
             var titleResult = document.All.Where(m => m.LocalName == "div" && m.Id == "i1");
             string title = titleResult.First().QuerySelector("h1").Text();
-            imageModel.ImageName = title + "_" + imageNum;
-            imageModel.ImageFileExtention = "jpg";
+            string imageName = title + "_" + imageNum;
 
-            return imageModel;
+            
+            return new List<ImageModel>() {new ImageModel(imagePageModel,imageName,imageUrl) };
         }
 
     }

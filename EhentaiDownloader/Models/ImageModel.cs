@@ -23,9 +23,31 @@ namespace EhentaiDownloader.Models
             get { return Path.Combine(DelegateCommands.GetFolderPathCommand?.Invoke(), ImageName + "." + ImageFileExtention); }
             //set; 
         }
-        public string ImagePageUrl { get; set; }
-        public string ImageFileExtention { get; set; }
+        //public string ImagePageUrl { get; set; }
+        public string ImageFileExtention
+        {
+            get 
+            {
+                string[] splitResult = ImageUrl.Split('.');
+                if (splitResult.Length > 0)
+                {
+                return splitResult[splitResult.Length - 1];
+                }
+                else
+                {
+                    return "UnFoundType";
+                }
+            }
+        }
 
-        public TaskItem TaskItem { get; set; }
+        //public TaskItem TaskItem { get; set; }
+        public ImagePageModel ImagePage { get; set; }
+
+        public ImageModel(ImagePageModel imagePage, string imageName, string imageUrl)
+        {
+            this.ImagePage = imagePage;
+            this.ImageName = imageName;
+            this.ImageUrl = imageUrl;
+        }
     }
 }

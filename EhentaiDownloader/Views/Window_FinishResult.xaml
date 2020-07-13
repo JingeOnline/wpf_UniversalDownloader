@@ -10,11 +10,33 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Download Finish" FontSize="32" HorizontalAlignment="Center"/>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding ImageList,Mode=OneWay}" AutoGenerateColumns="True"/>
-        <Grid Grid.Row="2" Margin="0,8,0,0">
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock  FontSize="18" Margin="0,4">
+                <Run Text="Webpages are not available:"/>
+                <Run Text="{Binding ElementName=DataGrid_1,Path=Items.Count, Mode=OneWay}"/>
+            </TextBlock>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ImagePageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_1"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="18" Margin="0,4">
+                <Run Text="Images fail to download:" />
+                <Run Text="{Binding ElementName=DataGrid_2,Path=Items.Count, Mode=OneWay}"/>
+            </TextBlock>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ImageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_2"/>
+        </Grid>
+        <Grid Grid.Row="3" Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

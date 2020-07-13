@@ -17,9 +17,9 @@ namespace EhentaiDownloader.Tools
     {
         //private static string albumTitle;
 
-        public async Task<List<string>> FindImagePageUrl(string url)
+        public async Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem)
         {
-            
+            string url = taskItem.Url;
             if (url[url.Length - 1] != '#')
             {
                 url += "#";
@@ -32,23 +32,26 @@ namespace EhentaiDownloader.Tools
             var result = document.All.Where(m => m.LocalName == "div" && m.ClassName == "preview_thumb");
             Debug.WriteLine("成功：" + "找到图片网页" + result.Count() + "个");
 
-            List<string> imagePageUrls = new List<string>();
+            List<ImagePageModel> imagePageModels = new List<ImagePageModel>();
             foreach (var res in result)
             {
-                imagePageUrls.Add(res.QuerySelector("a").GetAttribute("href"));
+                string pageUrl = "https://asmhentai.com"+res.QuerySelector("a").GetAttribute("href");
+                imagePageModels.Add(new ImagePageModel(pageUrl, taskItem));
             }
-
-            return imagePageUrls.Select(link => "https://asmhentai.com" + link).ToList();
+            return imagePageModels;
+            //return imagePageUrls.Select(link => "https://asmhentai.com" + link).ToList();
         }
 
-        public async Task<ImageModel> FindImageUrl(ImageModel imageModel)
+        public async Task<List<ImageModel>> FindImageUrls(ImagePageModel imagePageModel)
         {
-            string html = await HttpDownloader.DownloadHtmlPage(imageModel.ImagePageUrl);
+            string html = await HttpDownloader.DownloadHtmlPage(imagePageModel.ImagePageUrl);
+            
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             IEnumerable<IElement> urlResult = document.All.Where(m => m.LocalName == "img" && m.ClassName == "lazy no_image");
 
+            string imageUrl;
             if (urlResult.Count() == 0)
             {
                 urlResult = document.All.Where(m => m.LocalName == "div" && m.ClassName == "image_1");
@@ -60,19 +63,17 @@ namespace EhentaiDownloader.Tools
                 }
                 else
                 {
-                    imageModel.ImageUrl = "https://" + urlResult.First().QuerySelector("img").GetAttribute("src").Remove(0, 2);
+                    imageUrl = "https://" + urlResult.First().QuerySelector("img").GetAttribute("src").Remove(0, 2);
                 }
             }
             else
             {
-                imageModel.ImageUrl = "https://" + urlResult.First().GetAttribute("src").Remove(0, 2);
+                imageUrl = "https://" + urlResult.First().GetAttribute("src").Remove(0, 2);
             }
 
-            var nameResult = document.All.Where(m => m.LocalName == "title");
-            imageModel.ImageName = nameResult.First().Text();
-            imageModel.ImageFileExtention = "jpg";
-
-            return imageModel;
+            string imageName = document.All.Where(m => m.LocalName == "title").First().Text();
+            ImageModel imageModel = new ImageModel(imagePageModel,imageName,imageUrl);
+            return new List<ImageModel>() {imageModel};
         }
     }
 }

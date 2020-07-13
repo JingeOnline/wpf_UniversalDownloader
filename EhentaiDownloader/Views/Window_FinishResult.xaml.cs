@@ -32,11 +32,18 @@ namespace EhentaiDownloader.Views
             get { return _imageList; }
             set { _imageList = value;OnPropertyChanged(); } 
         }
+        public List<ImagePageModel> _imagePageList;
+        public List<ImagePageModel> ImagePageList
+        {
+            get { return _imagePageList; }
+            set { _imagePageList = value;OnPropertyChanged(); }
+        }
 
         public Window_FinishResult()
         {
             InitializeComponent();
-            ImageList = DownloadService.DownloadFails;
+            ImageList = DownloadService.DownloadFailImages;
+            _imagePageList = DownloadService.UnAvailablePages;
             this.DataContext = this;
         }
 
@@ -54,7 +61,7 @@ namespace EhentaiDownloader.Views
         {
             new Window_SetTimeOut().ShowDialog();
             this.Close();
-            DownloadService.ReTry();
+            DownloadService.ReTryAsync();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)

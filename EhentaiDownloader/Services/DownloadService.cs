@@ -22,14 +22,16 @@ namespace EhentaiDownloader.Services
 {
     class DownloadService
     {
-        public static List<ImageModel> DownloadFails { get; set; } = new List<ImageModel>();
-        public static List<ImageModel> DownloadFinish { get; set; } = new List<ImageModel>();
+        public static int ParallelTaskNum { get; set; } = 10;
+        public static List<ImageModel> DownloadFailImages { get; set; } = new List<ImageModel>();
+        public static List<ImageModel> DownloadFinishImages { get; set; } = new List<ImageModel>();
+        public static List<ImagePageModel> UnAvailablePages { get; set; } = new List<ImagePageModel>();
         private static IWebpageParser webpageParser;
 
         public static async Task StartDownload(ObservableCollection<TaskItem> taskItems)
         {
-            DownloadFails.Clear();
-            DownloadFinish.Clear();
+            DownloadFailImages.Clear();
+            DownloadFinishImages.Clear();
             for (int i = 0; i < taskItems.Count; i++)
             {
                 taskItems[i].Status = "Downloading";
@@ -64,22 +66,56 @@ namespace EhentaiDownloader.Services
                 return;
             }
 
-            List<string> imagePageUrls = await webpageParser.FindImagePageUrl(taskItem.Url);
-            taskItem.NumberOfFiles = imagePageUrls.Count();
-            if (imagePageUrls.Count() == 0)
+            List<ImagePageModel> imagePages = await webpageParser.FindImagePageUrl(taskItem);
+            if (imagePages.Count() == 0)
             {
                 taskItem.Status = "No ImagePage Found";
                 return;
             }
-            Debug.WriteLine("成功：" + "共找到Image页面:" + imagePageUrls.Count());
-
-            List<ImageModel> imageModelList=new List<ImageModel>();
-            foreach(string imagePageUrl in imagePageUrls)
-            {
-                imageModelList.Add(new ImageModel {ImagePageUrl=imagePageUrl,TaskItem=taskItem });
-            }
-            await downloadFromImagePageParallel(imageModelList);
+            Debug.WriteLine("成功：" + "共找到Image页面:" + imagePages.Count());
+            List<ImageModel> imageModels = await getAllImageUrls(imagePages);
+            await downloadImagesParallel(imageModels);
         }
+        
+        /// <summary>
+        /// 获得所有图片页面的所有图片Url
+        /// </summary>
+        /// <param name="imagePageModels"></param>
+        /// <returns></returns>
+        private static async Task<List<ImageModel>> getAllImageUrls(List<ImagePageModel> imagePageModels)
+        {
+            List<Task> tasks = new List<Task>();
+            var limitation = new SemaphoreSlim(ParallelTaskNum);
+            List<ImageModel> imageModels = new List<ImageModel>();
+            foreach(ImagePageModel imagePageModel in imagePageModels)
+            {
+                ImagePageModel imagePage = imagePageModel;
+                await limitation.WaitAsync();
+                tasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        List<ImageModel> imagesInAPage = await webpageParser.FindImageUrls(imagePage);
+                        imagePage.TaskItem.NumberOfFiles += imagesInAPage.Count();
+                        imageModels.AddRange(imagesInAPage);
+                    }
+                    catch(Exception e)
+                    {
+                        UnAvailablePages.Add(imagePage);
+                        Debug.WriteLine("getAllImageUrls("+imagePage.ImagePageUrl+")发生错误，" + e.Message);
+                    }
+                    finally
+                    {
+                        limitation.Release();
+                    }
+                }));
+            }
+            //等待所有Task完成
+            await Task.WhenAll(tasks);
+            Debug.WriteLine("共找到图片=" + imageModels.Count());
+            return imageModels;
+        }
+
 
         /// <summary>
         /// 从网页中查找图片链接并下载到本地（异步）
@@ -87,31 +123,28 @@ namespace EhentaiDownloader.Services
         /// <param name="imagePageUrls">一组网页的Url</param>
         /// <param name="taskItem">该组网页所属的TaskItem</param>
         /// <returns>Task</returns>
-        private static async Task downloadFromImagePageParallel(List<ImageModel> imageList)
+        private static async Task downloadImagesParallel(List<ImageModel> imageModelList)
         {
             List<Task> taskList = new List<Task>();
-            var limitation = new SemaphoreSlim(initialCount: 10, maxCount: 10);
-            foreach (ImageModel imageModel in imageList)
+            var limitation = new SemaphoreSlim(ParallelTaskNum);
+            foreach (ImageModel imageModel in imageModelList)
             {
-                ImageModel imageModelTemp = imageModel;
+                //ImageModel imageModelTemp = imageModel;
                 await limitation.WaitAsync();
                 //把Task添加到线程池中
                 taskList.Add(Task.Run(async () =>
                 {
                     try
                     {
-                        imageModelTemp = await webpageParser.FindImageUrl(imageModelTemp);
-                        await downloadAImageAndSave(imageModelTemp);
-
-                        imageModelTemp.TaskItem.NumberOfFinish++;
-                        DownloadFinish.Add(imageModelTemp);
-                        DelegateCommands.SetImageDownloadCountCommand?.Invoke(DownloadFinish.Count());
-
+                        await downloadAImageAndSave(imageModel);
+                        imageModel.ImagePage.TaskItem.NumberOfFinish++;
+                        DownloadFinishImages.Add(imageModel);
+                        DelegateCommands.SetImageDownloadCountCommand?.Invoke(DownloadFinishImages.Count());
                     }
                     catch (Exception e)
                     {
-                        DownloadFails.Add(imageModelTemp);
-                        DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFails.Count());
+                        DownloadFailImages.Add(imageModel);
+                        DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFailImages.Count());
                     }
                     finally
                     {
@@ -154,15 +187,15 @@ namespace EhentaiDownloader.Services
         /// 下载结束后重新尝试下载失败的图片（异步）
         /// </summary>
         /// <returns>Task</returns>
-        public static async Task ReTry()
+        public static async Task ReTryAsync()
         {
             Debug.WriteLine("成功：" + "开始Retry");
             List<ImageModel> failsList = new List<ImageModel>();
-            DownloadFails.ForEach(img => failsList.Add(img));
+            DownloadFailImages.ForEach(img => failsList.Add(img));
 
-            DownloadFails.Clear();
-            DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFails.Count());
-            await downloadFromImagePageParallel(failsList);
+            DownloadFailImages.Clear();
+            DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFailImages.Count());
+            await downloadImagesParallel(failsList);
             new Window_FinishResult().Show();
         }
     }
