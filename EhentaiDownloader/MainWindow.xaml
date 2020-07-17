@@ -54,10 +54,18 @@
             <DockPanel Grid.Row="1">
                 <Button Style="{StaticResource ThemeButton}" Content="Add" DockPanel.Dock="Right" Width="64" VerticalAlignment="Center"
                         x:Name="Button_Add" Click="Button_Add_Click"/>
-                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}"/>
+                <ComboBox x:Name="ComboBox_InputMethod" Width="128" DockPanel.Dock="Left" Height="26" 
+                          VerticalContentAlignment="Center" SelectionChanged="ComboBox_InputMethod_SelectionChanged">
+                    <ComboBoxItem IsSelected="True" Content="单条Url"/>
+                    <ComboBoxItem Content="查找多条Url"/>
+                    <ComboBoxItem Content="SHZX相册页解析"/>
+                </ComboBox>
+                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}"
+                         TextWrapping="Wrap" AcceptsReturn="True" MaxHeight="64" VerticalScrollBarVisibility="Auto"/>
             </DockPanel>
             <!--下载列表DataGird-->
-            <DataGrid Grid.Row="2" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False">
+            <DataGrid Grid.Row="2" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False"
+                      x:Name="DataGrid_Tasks" LoadingRow="DataGrid_Tasks_LoadingRow">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn >
                         <DataGridTemplateColumn.Header>
@@ -116,6 +124,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock FontSize="14" VerticalAlignment="Center" >
                 <Run Text="Image Download: "/>
@@ -126,6 +135,10 @@
                 <Run Text="{Binding ImageDownloadSizeUi,Mode=OneWay}"/>
             </TextBlock>
             <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="2">
+                <Run Text="Unavailable Image Pages: "/>
+                <Run Text="{Binding ImagePageUnavailableCount,Mode=OneWay}"/>
+            </TextBlock>
+            <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="3">
                 <Run Text="Image Fails: "/>
                 <Run Text="{Binding ImageDownloadFailCount,Mode=OneWay}"/>
             </TextBlock>

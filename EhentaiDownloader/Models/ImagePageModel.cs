@@ -21,5 +21,11 @@ namespace EhentaiDownloader.Models
             this.ImagePageUrl = imagePageUrl;
             this.TaskItem = taskItem;
         }
+
+        public override string ToString()
+        {
+            //return base.ToString();
+            return ImagePageUrl;
+        }
     }
 }

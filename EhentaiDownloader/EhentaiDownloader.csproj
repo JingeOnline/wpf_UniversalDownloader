@@ -74,11 +74,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Delegates\DelegateCommands.cs" />
+    <Compile Include="Exceptions\TargetNotFindException.cs" />
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Models\ImagePageModel.cs" />
     <Compile Include="Models\ParseResult.cs" />
     <Compile Include="Parsers\IWebpageParser.cs" />
     <Compile Include="Parsers\ShzxParser.cs" />
+    <Compile Include="Parsers\ShzxParser_ParentParser.cs" />
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Parsers\AsmHentaiParser.cs" />
     <Compile Include="Parsers\EHentaiParser.cs" />

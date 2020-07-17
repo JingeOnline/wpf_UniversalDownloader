@@ -20,6 +20,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using EhentaiDownloader.Services;
 using EhentaiDownloader.Views;
 using EhentaiDownloader.Delegates;
+using System.Text.RegularExpressions;
+using EhentaiDownloader.Parsers;
 
 namespace EhentaiDownloader
 {
@@ -42,24 +44,31 @@ namespace EhentaiDownloader
             get { return _saveFolder; }
             set { _saveFolder = value; OnPropertyChanged(); }
         }
-        public int _imageDownloadCount;
+        private int _imageDownloadCount;
         public int ImageDownloadCount
         {
             get { return _imageDownloadCount; }
             set { _imageDownloadCount = value; OnPropertyChanged(); }
         }
-        public int _imageDownloadFailCount;
+        private int _imageDownloadFailCount;
         public int ImageDownloadFailCount
         {
             get { return _imageDownloadFailCount; }
             set { _imageDownloadFailCount = value; OnPropertyChanged(); }
         }
-        public long _imageDownloadSize=0;
+        private long _imageDownloadSize=0;
         public long ImageDownloadSize
         {
             get { return _imageDownloadSize; }
             set { _imageDownloadSize = value;OnPropertyChanged(); OnPropertyChanged("ImageDownloadSizeUi"); }
         }
+        private int _imagePageUnavailableCount;
+        public int ImagePageUnavailableCount
+        {
+            get { return _imagePageUnavailableCount; }
+            set { _imagePageUnavailableCount = value;OnPropertyChanged(); }
+        }
+
         public string ImageDownloadSizeUi
         {
             get 
@@ -68,10 +77,12 @@ namespace EhentaiDownloader
                 if (ImageDownloadSize < 1024 * 1024 * 1024) { return (ImageDownloadSize / 1024 / 1024).ToString() + " MB"; }
                 else
                 {
-                    return (ImageDownloadSize / 1024 / 1024 / 1024).ToString() + " GB";
+                    return (ImageDownloadSize / (float) 1024 / 1024 / 1024).ToString("0.00") + " GB";
                 }
             }
         }
+
+        private Action<string> addUserInputToTaskList;
 
         public MainWindow()
         {
@@ -92,7 +103,7 @@ namespace EhentaiDownloader
 
         private void Button_Add_Click(object sender, RoutedEventArgs e)
         {
-            DownloadTaskCollection.Add(new TaskItem(UrlInput));
+            addUserInputToTaskList(UrlInput);
             UrlInput = string.Empty;
         }
 
@@ -133,6 +144,7 @@ namespace EhentaiDownloader
             DelegateCommands.SetImageDownloadCountCommand= (x) => ImageDownloadCount = x;
             DelegateCommands.SetImageDownloadFailCountCommand=(x)=>ImageDownloadFailCount=x;
             DelegateCommands.AddImageDownloadSizeCommand = (x) => ImageDownloadSize += x;
+            DelegateCommands.SetUnavailableImagePageCountCommand = (x) => ImagePageUnavailableCount = x;
         }
 
         private void Button_RemoveFromList_Click(object sender, RoutedEventArgs e)
@@ -140,6 +152,58 @@ namespace EhentaiDownloader
             Button button = sender as Button;
             TaskItem taskItem = button.DataContext as TaskItem;
             DownloadTaskCollection.Remove(taskItem);
+            DataGrid_Tasks.Items.Refresh();
+        }
+
+        private void ComboBox_InputMethod_DropDownClosed(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ComboBox_InputMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            int index = comboBox.SelectedIndex;
+            if (index == 0)
+            {
+                addUserInputToTaskList = (s) =>
+                {
+                    DownloadTaskCollection.Add(new TaskItem(s.Trim()));
+                };
+            }
+            else if (index == 1)
+            {
+                addUserInputToTaskList = (s) =>
+                {
+                    string pattern = @"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]";
+                    MatchCollection matches = Regex.Matches(s, pattern);
+                    foreach(Match match in matches)
+                    {
+                        DownloadTaskCollection.Add(new TaskItem(match.Value));
+                    }
+                };
+
+            }
+            else if (index == 2)
+            {
+                addUserInputToTaskList = async (s) =>
+                  {
+                      List<string> urls = await new ShzxParser_ParentParser().Parse(s);
+                      foreach(string url in urls)
+                      {
+                          DownloadTaskCollection.Add(new TaskItem(url));
+                      }
+                  };
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void DataGrid_Tasks_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            e.Row.Header = (e.Row.GetIndex() + 1).ToString();
         }
     }
 }

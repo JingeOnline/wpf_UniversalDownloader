@@ -16,5 +16,6 @@ namespace EhentaiDownloader.Delegates
         public static Action<int> SetImageDownloadCountCommand { get; set; }
         public static Action<int> SetImageDownloadFailCountCommand { get; set; }
         public static Action<long> AddImageDownloadSizeCommand { get; set; }
+        public static Action<int> SetUnavailableImagePageCountCommand { get; set; }
     }
 }

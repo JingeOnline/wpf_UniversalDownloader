@@ -15,12 +15,11 @@ namespace EhentaiDownloader.Tools
             try
             {
                 File.WriteAllBytes(filePath, bytes);
-                Debug.WriteLine("成功:" + "文件" + filePath + "写入成功");
+                //Debug.WriteLine("成功:" + "文件" + filePath + "写入成功");
             }
             catch (Exception e)
             {
-                Debug.WriteLine("文件" + filePath + "写入失败");
-                Debug.WriteLine("写入失败原因" + e.Message);
+                Debug.Write("失败:文件" + filePath + "写入失败。"+ "原因:" + e.Message);
                 throw e;
             }
         }

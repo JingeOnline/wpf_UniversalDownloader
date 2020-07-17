@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EhentaiDownloader", "EhentaiDownloader\EhentaiDownloader.csproj", "{67E476FB-E056-4C7D-AA34-B3C764A790C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test1", "Test1\Test1.csproj", "{F913831B-C104-40C2-B8C4-6B0855188AFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{E517D1C7-8D7D-483C-AEE3-DE58C7325622}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{67E476FB-E056-4C7D-AA34-B3C764A790C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67E476FB-E056-4C7D-AA34-B3C764A790C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67E476FB-E056-4C7D-AA34-B3C764A790C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F913831B-C104-40C2-B8C4-6B0855188AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F913831B-C104-40C2-B8C4-6B0855188AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F913831B-C104-40C2-B8C4-6B0855188AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F913831B-C104-40C2-B8C4-6B0855188AFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E517D1C7-8D7D-483C-AEE3-DE58C7325622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E517D1C7-8D7D-483C-AEE3-DE58C7325622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E517D1C7-8D7D-483C-AEE3-DE58C7325622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E517D1C7-8D7D-483C-AEE3-DE58C7325622}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,21 +68,14 @@ namespace EhentaiDownloader.Tools
                 return new ParseResult { NextPage = null, ImagePageList = findImagePageLink() };
             }
 
-            //void findAlbumTitle()
-            //{
-            //    IEnumerable<IElement> titleElement = document.All.Where(m => m.LocalName == "h1" && m.Id == "gn");
-            //    albumTitle = titleElement.First().Text();
-            //    Char[] unSafeChars= {'*','.','\\','/','|','\"','|','?','<','>'};
-            //    foreach(char c in unSafeChars)
-            //    {
-            //        albumTitle=albumTitle.Replace(c, '_');
-            //    }
-            //    Debug.WriteLine("找到album title=" +albumTitle);
-            //}
 
             List<string> findImagePageLink()
             {
                 var results = document.All.Where(m => m.LocalName == "div" && m.ClassName == "gdtm");
+                if(results.Count()==0)
+                {
+                    throw new Exception("未找到div.gdtm元素");
+                }
                 List<string> imagePageUrls = new List<string>();
                 foreach (var res in results)
                 {

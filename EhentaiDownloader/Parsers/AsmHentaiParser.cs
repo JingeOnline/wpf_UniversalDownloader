@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using EhentaiDownloader.Delegates;
+using EhentaiDownloader.Exceptions;
 using EhentaiDownloader.Models;
 using EhentaiDownloader.Parsers;
 
@@ -30,6 +31,10 @@ namespace EhentaiDownloader.Tools
             IBrowsingContext context = BrowsingContext.New(config);
             IDocument document = await context.OpenAsync(response => response.Content(html));
             var result = document.All.Where(m => m.LocalName == "div" && m.ClassName == "preview_thumb");
+            if (result.Count() == 0)
+            {
+                throw new TargetNotFindException("未找到div.preview_thumb元素");
+            }
             Debug.WriteLine("成功：" + "找到图片网页" + result.Count() + "个");
 
             List<ImagePageModel> imagePageModels = new List<ImagePageModel>();

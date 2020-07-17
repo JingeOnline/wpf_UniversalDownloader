@@ -36,7 +36,7 @@ namespace EhentaiDownloader.Tools
             try
             {
                 string htmlText = await httpClient.GetStringAsync(uri);
-                Debug.WriteLine("成功:" + uri + " 页面html获取成功");
+                //Debug.WriteLine("成功:" + uri + " 页面html获取成功");
                 return htmlText;
             }
             catch(Exception e)
@@ -53,7 +53,7 @@ namespace EhentaiDownloader.Tools
             try
             {
                 string htmlText = await httpClient.GetStringAsync(uri);
-                Debug.WriteLine("成功:" + uri + " 页面html获取成功");
+                //Debug.WriteLine("成功:" + uri + " 页面html获取成功");
                 return htmlText;
             }
             catch (Exception e)
@@ -70,7 +70,7 @@ namespace EhentaiDownloader.Tools
             try
             {
                 byte[] file = await httpClient.GetByteArrayAsync(uri);
-                Debug.WriteLine("成功:"+uri + "二进制文件获取成功");
+                //Debug.WriteLine("成功:"+uri + "二进制文件获取成功");
                 DelegateCommands.AddImageDownloadSizeCommand((long)file.Length);
                 return file;
             }
@@ -88,7 +88,7 @@ namespace EhentaiDownloader.Tools
             try
             {
                 byte[] file = await httpClient.GetByteArrayAsync(uri);
-                Debug.WriteLine("成功:"+uri + "二进制文件获取成功");
+                //Debug.WriteLine("成功:"+uri + "二进制文件获取成功");
                 return file;
             }
             catch (Exception e)
