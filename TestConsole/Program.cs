@@ -14,8 +14,10 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            MultiTaskTest().Wait();
+            //MultiTaskTest().Wait();
             //testShzxParserAsync().Wait();
+            multiThreadTest();
+            Console.ReadKey();
         }
 
         public static async Task testShzxParserAsync()
@@ -23,6 +25,41 @@ namespace TestConsole
             ShzxParser parser = new ShzxParser();
             string html = File.ReadAllText("./HtmlPages/HTMLPage1.html");
             //List<ImageModel> imageModels= await parser.test(html);
+        }
+
+        public static void multiThreadTest()
+        {
+            //add();
+
+            //object locker = new object();
+
+            Thread t1 = new Thread(new ThreadStart(add));
+            Thread t2 = new Thread(new ThreadStart(add));
+            Thread t3 = new Thread(new ThreadStart(add));
+            Thread t4 = new Thread(new ThreadStart(add));
+            Thread t5 = new Thread(new ThreadStart(add));
+            t1.Start();
+            t2.Start();
+            t3.Start();
+            t4.Start();
+            t5.Start();
+            t1.Join();
+            t2.Join();
+            t3.Join();
+            t4.Join();
+            t5.Join();
+            Console.WriteLine(money);
+        }
+
+        static int money=0;
+
+        public static void add()
+        {
+            for (int i = 0; i < 100000; i++)
+            {
+                money += 1;
+                //Console.WriteLine(money);
+            }
         }
 
         public async static Task MultiTaskTest()
@@ -60,27 +97,5 @@ namespace TestConsole
             Console.WriteLine(newList.Count);
             Console.ReadKey();
         }
-
-        //public static void Task_0(List<int> list)
-        //{
-        //    for(int i=0;i<=10000 ; i++)
-        //    {
-        //        list.Add(i);
-        //    }
-        //}
-        //public static void Task_1(List<int> list)
-        //{
-        //    for (int i = 0; i <= 10000; i++)
-        //    {
-        //        list.Add(i);
-        //    }
-        //}
-        //public static void Task_2(List<int> list)
-        //{
-        //    for (int i = 0; i <= 10000; i++)
-        //    {
-        //        list.Add(i);
-        //    }
-        //}
     }
 }

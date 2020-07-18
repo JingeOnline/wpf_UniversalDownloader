@@ -17,14 +17,14 @@ namespace EhentaiDownloader.Tools
         private static HttpClient httpClient;
 
         private static TimeSpan timeOut = new TimeSpan(0, 0, 30);
-        public static void setTimeOut(int second)
+        public static void SetTimeOut(int second)
         {
             timeOut = new TimeSpan(0,0,second);
             Debug.WriteLine("成功:" + "设定TimeOut=" + timeOut.TotalSeconds+"秒");
         }
-        public static double getTimeOut()
+        public static int GetTimeOut()
         {
-            return timeOut.TotalSeconds;
+            return (int)timeOut.TotalSeconds;
         }
 
 

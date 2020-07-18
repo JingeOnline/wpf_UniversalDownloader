@@ -24,20 +24,22 @@ namespace EhentaiDownloader.Views
     /// <summary>
     /// Window_FinishResult.xaml 的交互逻辑
     /// </summary>
-    public partial class Window_FinishResult : Window,INotifyPropertyChanged
+    public partial class Window_FinishResult : Window, INotifyPropertyChanged
     {
         public List<ImageModel> _imageList;
-        public List<ImageModel> ImageList 
+        public List<ImageModel> ImageList
         {
             get { return _imageList; }
-            set { _imageList = value;OnPropertyChanged(); } 
+            set { _imageList = value; OnPropertyChanged(); }
         }
         public List<ImagePageModel> _imagePageList;
         public List<ImagePageModel> ImagePageList
         {
             get { return _imagePageList; }
-            set { _imagePageList = value;OnPropertyChanged(); }
+            set { _imagePageList = value; OnPropertyChanged(); }
         }
+
+        private bool isRetry = false;
 
         public Window_FinishResult()
         {
@@ -60,6 +62,7 @@ namespace EhentaiDownloader.Views
         private void Button_ReTry_Click(object sender, RoutedEventArgs e)
         {
             new Window_SetTimeOut().ShowDialog();
+            isRetry = true;
             this.Close();
             DownloadService.ReTryAsync();
         }
@@ -72,7 +75,15 @@ namespace EhentaiDownloader.Views
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            Button_Cancel_Click(this.Button_Cancel,null);
+            if (!isRetry)
+            {
+                this.Close();
+                DelegateCommands.ClearAllCommand?.Invoke();
+            }
+            else
+            {
+                this.Close();
+            }
         }
     }
 }

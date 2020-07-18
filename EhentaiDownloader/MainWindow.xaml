@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EhentaiDownloader"
+        xmlns:converters="clr-namespace:EhentaiDownloader.Converters"
         mc:Ignorable="d"
         Title="Image Downloader" Height="450" Width="800"
         WindowStartupLocation="CenterScreen">
@@ -27,6 +28,14 @@
             </Setter>
         </Style>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!--设置面板中的条目title-->
+        <Style TargetType="TextBlock" x:Key="TextBlock_SettingTitle_Style">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,8,0,4"/>
+        </Style>
+        <!--设置面板中CheckBox转Bool-->
+        <converters:CheckBoxBoolConverter x:Key="CheckBoxConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -35,11 +44,49 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <!--菜单栏-->
-        <Menu>
-            <MenuItem Header="Setting">
-                <MenuItem Header="TimeOut" Click="MenuItem_Click"/>
-            </MenuItem>
-        </Menu>
+        <Grid Background="{StaticResource ThemeColor}">
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                <ToggleButton Background="Transparent" BorderThickness="0" Margin="4,0"
+                              x:Name="ToggleButton_Setting" >
+                    <ToggleButton.Content>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" 
+                                       Foreground="White" HorizontalAlignment="Center" FontSize="18"/>
+                            <TextBlock Text="Setting" Foreground="White"/>
+                        </StackPanel>
+                    </ToggleButton.Content>
+                    <!--Unchecked事件-->
+                    <ToggleButton.Triggers>
+                        <EventTrigger RoutedEvent="ToggleButton.Unchecked">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="HideSettingGrid">
+                                    <DoubleAnimation Storyboard.TargetName="Grid_Setting"
+                                                     Storyboard.TargetProperty="Width"
+                                                     BeginTime="0:0:0"
+                                                     From="200" To="0"
+                                                     Duration="0:0:0.2">
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <!--Checked事件-->
+                        <EventTrigger RoutedEvent="ToggleButton.Checked">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="OpenSettingGrid">
+                                    <DoubleAnimation Storyboard.TargetName="Grid_Setting"
+                                                     Storyboard.TargetProperty="Width"
+                                                     BeginTime="0:0:0"
+                                                     From="0" To="200"
+                                                     Duration="0:0:0.2">
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ToggleButton.Triggers>
+                </ToggleButton>
+            </StackPanel>
+        </Grid>
+        <!--主体部分-->
         <Grid Margin="8" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
@@ -142,6 +189,23 @@
                 <Run Text="Image Fails: "/>
                 <Run Text="{Binding ImageDownloadFailCount,Mode=OneWay}"/>
             </TextBlock>
+        </Grid>
+        <!--设置面板-->
+        <Grid Grid.Row="1" Grid.RowSpan="2" Width="0" HorizontalAlignment="Right" Background="{StaticResource ThemeColor}"
+              x:Name="Grid_Setting" MouseLeave="Grid_Setting_MouseLeave">
+            <StackPanel Margin="8">
+                <TextBlock Style="{StaticResource TextBlock_SettingTitle_Style}"
+                           Text="Http TimeOut (s)"/>
+                <TextBox HorizontalAlignment="Stretch" Text="{Binding TimeOut}"/>
+                <TextBlock Style="{StaticResource TextBlock_SettingTitle_Style}"
+                           Text="Sound Notification"/>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="On" GroupName="SoundSelection"
+                                 IsChecked="{Binding IsSoundOn }"/>
+                    <RadioButton Content="Off" Margin="8,0" GroupName="SoundSelection" 
+                                 IsChecked="{Binding IsSoundOn, Converter={StaticResource CheckBoxConverter}}"/>
+                </StackPanel>
+            </StackPanel>
         </Grid>
     </Grid>
 

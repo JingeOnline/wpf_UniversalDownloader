@@ -90,18 +90,6 @@ namespace EhentaiDownloader.Services
             }
             Debug.WriteLine("成功：" + "共找到ImagePage页面:" + imagePages.Count());
             List<ImageModel> imageModels = await getAllImageUrls(imagePages);
-            foreach (ImageModel i in imageModels)
-            {
-                if (i == null)
-                {
-                    Debug.WriteLine("!!!");
-                    throw new NullReferenceException();
-                }
-                else
-                {
-                    Debug.WriteLine("准备下载" + i.ImageUrl);
-                }
-            }
             await downloadImagesParallel(imageModels);
             taskItem.Status = "Download Finish";
         }
@@ -113,32 +101,34 @@ namespace EhentaiDownloader.Services
         /// <returns></returns>
         private static async Task<List<ImageModel>> getAllImageUrls(List<ImagePageModel> imagePageModels)
         {
+            Object lockObj = new Object();
             List<Task> tasks = new List<Task>();
             var limitation = new SemaphoreSlim(ParallelTaskNum);
             List<ImageModel> imageModels = new List<ImageModel>();
             foreach (ImagePageModel imagePageModel in imagePageModels)
             {
-                ImagePageModel imagePage = imagePageModel;
+                //ImagePageModel imagePage = imagePageModel;
                 await limitation.WaitAsync();
                 tasks.Add(Task.Run(async () =>
                 {
                     try
                     {
-                        List<ImageModel> imagesInAPage = await webpageParser.FindImageUrls(imagePage);
-                        //Debug.WriteLine($"在{imagePage.ImagePageUrl}中找到{imagesInAPage.Count()}个图片");
-                        imagePage.TaskItem.NumberOfFiles += imagesInAPage.Count();
-                        foreach(ImageModel i in imagesInAPage)
+                        List<ImageModel> imagesInAPage = await webpageParser.FindImageUrls(imagePageModel);
+                        imagePageModel.TaskItem.NumberOfFiles += imagesInAPage.Count();
+                        lock (lockObj)
                         {
-                            if (i == null) throw new NullReferenceException();
-                        }
                         imageModels.AddRange(imagesInAPage);
+                        }
                     }
                     catch (Exception e)
                     {
-                        imagePage.FailMessage = e.Message;
-                        UnAvailablePages.Add(imagePage);
+                        imagePageModel.FailMessage = e.Message;
+                        lock (lockObj)
+                        {
+                        UnAvailablePages.Add(imagePageModel);
                         DelegateCommands.SetUnavailableImagePageCountCommand?.Invoke(UnAvailablePages.Count());
-                        Debug.WriteLine("getAllImageUrls(" + imagePage.ImagePageUrl + ")发生错误，" + e.Message);
+                        }
+                        Debug.WriteLine("getAllImageUrls(" + imagePageModel.ImagePageUrl + ")发生错误，" + e.Message);
                     }
                     finally
                     {
@@ -161,28 +151,34 @@ namespace EhentaiDownloader.Services
         /// <returns>Task</returns>
         private static async Task downloadImagesParallel(List<ImageModel> imageModelList)
         {
-
+            Object lockObj = new Object();
             List<Task> taskList = new List<Task>();
             var limitation = new SemaphoreSlim(ParallelTaskNum);
             foreach (ImageModel imageModel in imageModelList)
             {
-                ImageModel imageModelTemp = imageModel;
+                //ImageModel imageModelTemp = imageModel;
                 await limitation.WaitAsync();
-                //Debug.WriteLine("准备下载" + imageModelTemp.ImageUrl);
+
                 //把Task添加到线程池中
                 taskList.Add(Task.Run(async () =>
                 {
                     try
                     {
-                        await downloadAImageAndSave(imageModelTemp);
-                        imageModelTemp.ImagePage.TaskItem.NumberOfFinish++;
-                        DownloadFinishImages.Add(imageModelTemp);
+                        await downloadAImageAndSave(imageModel);
+                        lock (lockObj)
+                        {
+                        imageModel.ImagePage.TaskItem.NumberOfFinish++;
+                        DownloadFinishImages.Add(imageModel);
                         DelegateCommands.SetImageDownloadCountCommand?.Invoke(DownloadFinishImages.Count());
+                        }
                     }
                     catch (Exception e)
                     {
-                        DownloadFailImages.Add(imageModelTemp);
+                        lock (lockObj)
+                        {
+                        DownloadFailImages.Add(imageModel);
                         DelegateCommands.SetImageDownloadFailCountCommand?.Invoke(DownloadFailImages.Count());
+                        }
                     }
                     finally
                     {

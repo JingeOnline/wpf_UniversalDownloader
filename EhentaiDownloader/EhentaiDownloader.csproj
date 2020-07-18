@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CheckBoxBoolConverter.cs" />
     <Compile Include="Delegates\DelegateCommands.cs" />
     <Compile Include="Exceptions\TargetNotFindException.cs" />
     <Compile Include="Models\ImageModel.cs" />

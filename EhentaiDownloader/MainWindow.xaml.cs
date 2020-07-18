@@ -22,6 +22,7 @@ using EhentaiDownloader.Views;
 using EhentaiDownloader.Delegates;
 using System.Text.RegularExpressions;
 using EhentaiDownloader.Parsers;
+using EhentaiDownloader.Tools;
 
 namespace EhentaiDownloader
 {
@@ -80,6 +81,19 @@ namespace EhentaiDownloader
                     return (ImageDownloadSize / (float) 1024 / 1024 / 1024).ToString("0.00") + " GB";
                 }
             }
+        }
+
+        //private int _timeOut;
+        public int TimeOut
+        {
+            get { return HttpDownloader.GetTimeOut(); }
+            set { HttpDownloader.SetTimeOut(value); }
+        }
+
+        public bool IsSoundOn
+        {
+            get { return SoundPlayer.IsOn; }
+            set { SoundPlayer.IsOn = value; }
         }
 
         private Action<string> addUserInputToTaskList;
@@ -204,6 +218,11 @@ namespace EhentaiDownloader
         private void DataGrid_Tasks_LoadingRow(object sender, DataGridRowEventArgs e)
         {
             e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+        }
+
+        private void Grid_Setting_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //ToggleButton_Setting.IsChecked = false;
         }
     }
 }

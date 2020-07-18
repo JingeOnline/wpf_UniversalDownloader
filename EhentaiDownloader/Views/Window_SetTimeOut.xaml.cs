@@ -30,13 +30,13 @@ namespace EhentaiDownloader.Views
         public Window_SetTimeOut()
         {
             InitializeComponent();
-            TimeOut = Convert.ToInt32(HttpDownloader.getTimeOut());
+            TimeOut = Convert.ToInt32(HttpDownloader.GetTimeOut());
             this.DataContext = this;
         }
 
         private void Button_Apply_Click(object sender, RoutedEventArgs e)
         {
-            HttpDownloader.setTimeOut(TimeOut);
+            HttpDownloader.SetTimeOut(TimeOut);
             this.Close();
         }
 
