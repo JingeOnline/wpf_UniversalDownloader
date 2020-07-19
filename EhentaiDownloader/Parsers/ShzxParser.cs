@@ -40,7 +40,15 @@ namespace EhentaiDownloader.Parsers
             {
                 throw new TargetNotFindException("无法在HTML中找到div.paging");
             }
-            string pageNumString = pageNumElement.QuerySelector("a").InnerHtml;
+            string pageNumString;
+            try
+            {
+                pageNumString = pageNumElement.QuerySelector("a").InnerHtml;
+            }
+            catch
+            {
+                throw new TargetNotFindException("无法在HTML中找到a标签");
+            }
             Match matchNum = Regex.Match(pageNumString, "[0-9]+");
             int maxPageNum = Int32.Parse(matchNum.Value);
             string generalUrl = taskItem.Url.Remove(taskItem.Url.Length - 6);
