@@ -4,209 +4,95 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EhentaiDownloader"
-        xmlns:converters="clr-namespace:EhentaiDownloader.Converters"
         mc:Ignorable="d"
         Title="Image Downloader" Height="450" Width="800"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <SolidColorBrush x:Key="ThemeColor" Color="DodgerBlue"/>
-        <Style TargetType="Button" x:Key="ThemeButton">
+        <Style TargetType="TextBlock" x:Key="Style_TextIcon">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
             <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Background" Value="{StaticResource ThemeColor}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Style_TextTitle">
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="{x:Type DataGridCell}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style TargetType="StackPanel" x:Key="Style_StackIconButton">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ThemeColorLight}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <!--设置面板中的条目title-->
-        <Style TargetType="TextBlock" x:Key="TextBlock_SettingTitle_Style">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Margin" Value="0,8,0,4"/>
-        </Style>
-        <!--设置面板中CheckBox转Bool-->
-        <converters:CheckBoxBoolConverter x:Key="CheckBoxConverter"/>
     </Window.Resources>
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
-        <!--菜单栏-->
-        <Grid Background="{StaticResource ThemeColor}">
-            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
-                <ToggleButton Background="Transparent" BorderThickness="0" Margin="4,0"
-                              x:Name="ToggleButton_Setting" >
-                    <ToggleButton.Content>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" 
-                                       Foreground="White" HorizontalAlignment="Center" FontSize="18"/>
-                            <TextBlock Text="Setting" Foreground="White"/>
-                        </StackPanel>
-                    </ToggleButton.Content>
-                    <!--Unchecked事件-->
-                    <ToggleButton.Triggers>
-                        <EventTrigger RoutedEvent="ToggleButton.Unchecked">
-                            <BeginStoryboard>
-                                <Storyboard x:Name="HideSettingGrid">
-                                    <DoubleAnimation Storyboard.TargetName="Grid_Setting"
-                                                     Storyboard.TargetProperty="Width"
-                                                     BeginTime="0:0:0"
-                                                     From="200" To="0"
-                                                     Duration="0:0:0.2">
-                                    </DoubleAnimation>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <!--Checked事件-->
-                        <EventTrigger RoutedEvent="ToggleButton.Checked">
-                            <BeginStoryboard>
-                                <Storyboard x:Name="OpenSettingGrid">
-                                    <DoubleAnimation Storyboard.TargetName="Grid_Setting"
-                                                     Storyboard.TargetProperty="Width"
-                                                     BeginTime="0:0:0"
-                                                     From="0" To="200"
-                                                     Duration="0:0:0.2">
-                                    </DoubleAnimation>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </ToggleButton.Triggers>
-                </ToggleButton>
-            </StackPanel>
-        </Grid>
-        <!--主体部分-->
-        <Grid Margin="8" Grid.Row="1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Background="DodgerBlue" x:Name="Grid_Navigation" Width="34">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <!--Logo-->
-            <TextBlock FontSize="32" Text="E-Hentai" HorizontalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource ThemeColor}"/>
-            <!--用户输入Url，Add按钮-->
-            <DockPanel Grid.Row="1">
-                <Button Style="{StaticResource ThemeButton}" Content="Add" DockPanel.Dock="Right" Width="64" VerticalAlignment="Center"
-                        x:Name="Button_Add" Click="Button_Add_Click"/>
-                <ComboBox x:Name="ComboBox_InputMethod" Width="128" DockPanel.Dock="Left" Height="26" 
-                          VerticalContentAlignment="Center" SelectionChanged="ComboBox_InputMethod_SelectionChanged">
-                    <ComboBoxItem IsSelected="True" Content="单条Url"/>
-                    <ComboBoxItem Content="查找多条Url"/>
-                    <ComboBoxItem Content="SHZX相册页解析"/>
-                </ComboBox>
-                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}"
-                         TextWrapping="Wrap" AcceptsReturn="True" MaxHeight="64" VerticalScrollBarVisibility="Auto"/>
-            </DockPanel>
-            <!--下载列表DataGird-->
-            <DataGrid Grid.Row="2" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False"
-                      x:Name="DataGrid_Tasks" LoadingRow="DataGrid_Tasks_LoadingRow">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn >
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Remove" FontWeight="Bold" />
-                        </DataGridTemplateColumn.Header>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button FontSize="18" FontFamily="Segoe MDL2 Assets" Content="&#xE107;" HorizontalAlignment="Stretch"
-                                           x:Name="Button_RemoveFromList" Background="SandyBrown" Foreground="White" Click="Button_RemoveFromList_Click"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn  Binding="{Binding Status}" Width="*" >
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="Status" FontWeight="Bold" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Url}" Width="*">
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="Url" FontWeight="Bold" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn  Binding="{Binding Files,Mode=OneWay}" Width="*">
-                        <DataGridTextColumn.Header>
-                            <TextBlock Text="Files" FontWeight="Bold" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
-                    <DataGridTemplateColumn Width="*">
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Progress" FontWeight="Bold" />
-                        </DataGridTemplateColumn.Header>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ProgressBar HorizontalAlignment="Stretch" Value="{Binding Progress,Mode=OneWay}" Maximum="1" 
-                                             Visibility="{Binding Path=ShowProgressBar,Converter={StaticResource BooleanToVisibilityConverter}}"
-                                             Height="24"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-            <!--开始下载按钮所在行-->
-            <Grid Grid.Row="3">
-                <StackPanel Orientation="Horizontal">
-                    <Button Style="{StaticResource ThemeButton}" Content="Save To" Width="88" Margin="0,0,8,0"
-                            x:Name="Button_SaveTo" Click="Button_SaveTo_Click" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding SaveFolder,Mode=OneWay}" FontSize="18" VerticalAlignment="Center"/>
+            <ToggleButton Content="&#xE700;" FontFamily="Segoe MDL2 Assets" 
+                          FontSize="18" Height="32" BorderThickness="0" Background="Transparent"
+                          Foreground="White" HorizontalAlignment="Left" Width="34">
+                <!--Unchecked事件-->
+                <ToggleButton.Triggers>
+                    <EventTrigger RoutedEvent="ToggleButton.Unchecked">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="HideSettingGrid">
+                                <DoubleAnimation Storyboard.TargetName="Grid_Navigation"
+                                                     Storyboard.TargetProperty="Width"
+                                                     BeginTime="0:0:0"
+                                                     From="160" To="34"
+                                                     Duration="0:0:0.2">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                    <!--Checked事件-->
+                    <EventTrigger RoutedEvent="ToggleButton.Checked">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="OpenSettingGrid">
+                                <DoubleAnimation Storyboard.TargetName="Grid_Navigation"
+                                                     Storyboard.TargetProperty="Width"
+                                                     BeginTime="0:0:0"
+                                                     From="34" To="160"
+                                                     Duration="0:0:0.2">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </ToggleButton.Triggers>
+            </ToggleButton>
+            
+            <StackPanel Grid.Row="1" Margin="0,16,0,0" >
+                <StackPanel Orientation="Horizontal" Style="{StaticResource Style_StackIconButton}"
+                            x:Name="StackPanel_PictureDownload" MouseDown="StackPanel_PictureDownload_MouseDown">
+                    <TextBlock Style="{StaticResource Style_TextIcon}" Text="&#xEB9F;"/>
+                    <TextBlock Text="Picture Download" Style="{StaticResource Style_TextTitle}"/>
                 </StackPanel>
-                <Button Style="{StaticResource ThemeButton}" Content="Start" HorizontalAlignment="Right" Width="88"
-                        x:Name="Button_Start" Click="Button_Start_Click" VerticalAlignment="Center"/>
-            </Grid>
-        </Grid>
-        <!--底部状态栏-->
-        <Grid Margin="0,0,0,0" Background="LightGray" Grid.Row="2" Height="24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock FontSize="14" VerticalAlignment="Center" >
-                <Run Text="Image Download: "/>
-                <Run Text="{Binding ImageDownloadCount,Mode=OneWay}"/>
-            </TextBlock>
-            <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="1">
-                <Run Text="Download Size: "/>
-                <Run Text="{Binding ImageDownloadSizeUi,Mode=OneWay}"/>
-            </TextBlock>
-            <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="2">
-                <Run Text="Unavailable Image Pages: "/>
-                <Run Text="{Binding ImagePageUnavailableCount,Mode=OneWay}"/>
-            </TextBlock>
-            <TextBlock FontSize="14" VerticalAlignment="Center" Grid.Column="3">
-                <Run Text="Image Fails: "/>
-                <Run Text="{Binding ImageDownloadFailCount,Mode=OneWay}"/>
-            </TextBlock>
-        </Grid>
-        <!--设置面板-->
-        <Grid Grid.Row="1" Grid.RowSpan="2" Width="0" HorizontalAlignment="Right" Background="{StaticResource ThemeColor}"
-              x:Name="Grid_Setting" MouseLeave="Grid_Setting_MouseLeave">
-            <StackPanel Margin="8">
-                <TextBlock Style="{StaticResource TextBlock_SettingTitle_Style}"
-                           Text="Http TimeOut (s)"/>
-                <TextBox HorizontalAlignment="Stretch" Text="{Binding TimeOut}"/>
-                <TextBlock Style="{StaticResource TextBlock_SettingTitle_Style}"
-                           Text="Sound Notification"/>
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="On" GroupName="SoundSelection"
-                                 IsChecked="{Binding IsSoundOn }"/>
-                    <RadioButton Content="Off" Margin="8,0" GroupName="SoundSelection" 
-                                 IsChecked="{Binding IsSoundOn, Converter={StaticResource CheckBoxConverter}}"/>
+                <StackPanel Orientation="Horizontal" Style="{StaticResource Style_StackIconButton}"
+                            x:Name="StackPanel_DataScraping" MouseDown="StackPanel_DataScraping_MouseDown">
+                    <TextBlock Style="{StaticResource Style_TextIcon}"  Text="&#xF000;"/>
+                    <TextBlock Text="Data Scraping" Style="{StaticResource Style_TextTitle}"/>
                 </StackPanel>
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="2" x:Name="StackPanel_Setting"
+                        Style="{StaticResource Style_StackIconButton}" MouseDown="StackPanel_Setting_MouseDown">
+                <TextBlock Text="&#xE115;" Style="{StaticResource Style_TextIcon}"/>
+                <TextBlock Text="Setting" Style="{StaticResource Style_TextTitle}"/>
+            </StackPanel>
         </Grid>
+        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
     </Grid>
 
 </Window>

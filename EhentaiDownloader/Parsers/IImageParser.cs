@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EhentaiDownloader.Parsers
 {
-    interface IWebpageParser
+    interface IImageParser
     {
         Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem);
         Task<List<ImageModel>> FindImageUrls(ImagePageModel imagePage);

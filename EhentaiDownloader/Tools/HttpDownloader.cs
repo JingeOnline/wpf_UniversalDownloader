@@ -71,7 +71,7 @@ namespace EhentaiDownloader.Tools
             {
                 byte[] file = await httpClient.GetByteArrayAsync(uri);
                 //Debug.WriteLine("成功:"+uri + "二进制文件获取成功");
-                DelegateCommands.AddImageDownloadSizeCommand((long)file.Length);
+                DelegateCommands.AddImageDownloadSizeCommand?.Invoke((long)file.Length);
                 return file;
             }
             catch(Exception e)

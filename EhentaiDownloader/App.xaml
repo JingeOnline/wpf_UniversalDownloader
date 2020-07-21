@@ -4,6 +4,33 @@
              xmlns:local="clr-namespace:EhentaiDownloader"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!--主题颜色-->
+        <SolidColorBrush x:Key="ThemeColor" Color="DodgerBlue"/>
+        <SolidColorBrush x:Key="ThemeColorLight" Color="#FF4CA7FF"/>
+        <SolidColorBrush x:Key="ThemeColorDark" Color="#FF0078EE"/>
+        <!--主题风格按钮-->
+        <Style TargetType="Button" x:Key="ThemeButton">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Background" Value="{StaticResource ThemeColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
+        <!--设置面板中的条目title-->
+        <Style TargetType="TextBlock" x:Key="TextBlock_ElementTitle">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,8,0,4"/>
+            <Setter Property="FontWeight" Value="DemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!--状态栏-->
+        <Style TargetType="Grid" x:Key="Grid_StatusBar">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Height" Value="24"/>
+        </Style>
+        <!--状态栏文本-->
+        <Style TargetType="TextBlock" x:Key="TextBlock_Status">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Application.Resources>
 </Application>

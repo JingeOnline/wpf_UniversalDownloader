@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{67E476FB-E056-4C7D-AA34-B3C764A790C2}</ProjectGuid>
+    <ProjectGuid>{A62E32D3-B432-4EAC-92C6-31C0301155E2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>EhentaiDownloader</RootNamespace>
-    <AssemblyName>ImageDownloader</AssemblyName>
+    <RootNamespace>Navigation</RootNamespace>
+    <AssemblyName>Navigation</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -34,27 +34,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Studiomx-Web-Earth-Download.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=0.14.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.0.14.0\lib\net472\AngleSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.4.5.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -73,43 +57,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\CheckBoxBoolConverter.cs" />
-    <Compile Include="Delegates\DelegateCommands.cs" />
-    <Compile Include="Exceptions\TargetNotFindException.cs" />
-    <Compile Include="Models\EbookModel.cs" />
-    <Compile Include="Models\ImageModel.cs" />
-    <Compile Include="Models\ImagePageModel.cs" />
-    <Compile Include="Models\ParseResult.cs" />
-    <Compile Include="Models\WebPageModel.cs" />
-    <Compile Include="Parsers\AllitebooksParser.cs" />
-    <Compile Include="Parsers\IEbookParser.cs" />
-    <Compile Include="Parsers\IImageParser.cs" />
-    <Compile Include="Parsers\ShzxParser.cs" />
-    <Compile Include="Parsers\ShzxParser_ParentParser.cs" />
-    <Compile Include="Services\DataScrapingService.cs" />
-    <Compile Include="Services\ImageDownloadService.cs" />
-    <Compile Include="Parsers\AsmHentaiParser.cs" />
-    <Compile Include="Parsers\EHentaiParser.cs" />
-    <Compile Include="Tools\CsvHelper.cs" />
-    <Compile Include="Tools\FileWriter.cs" />
-    <Compile Include="Tools\HttpDownloader.cs" />
-    <Compile Include="Tools\SoundPlayer.cs" />
-    <Compile Include="Tools\TimeHelper.cs" />
-    <Compile Include="Views\Page_DataScraping.xaml.cs">
-      <DependentUpon>Page_DataScraping.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Page_ImageDownload.xaml.cs">
-      <DependentUpon>Page_ImageDownload.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Page_Setting.xaml.cs">
-      <DependentUpon>Page_Setting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Window_FinishResult.xaml.cs">
-      <DependentUpon>Window_FinishResult.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Window_SetTimeOut.xaml.cs">
-      <DependentUpon>Window_SetTimeOut.xaml</DependentUpon>
-    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -122,29 +69,22 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\Page_DataScraping.xaml">
+    <Page Include="Page1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Page_ImageDownload.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Page_Setting.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Window_FinishResult.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Window_SetTimeOut.xaml">
+    <Page Include="Page2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\TaskItem.cs" />
+    <Compile Include="Page1.xaml.cs">
+      <DependentUpon>Page1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Page2.xaml.cs">
+      <DependentUpon>Page2.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -162,7 +102,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -170,9 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Studiomx-Web-Earth-Download.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

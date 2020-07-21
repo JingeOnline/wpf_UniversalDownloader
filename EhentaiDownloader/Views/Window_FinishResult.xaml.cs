@@ -44,8 +44,8 @@ namespace EhentaiDownloader.Views
         public Window_FinishResult()
         {
             InitializeComponent();
-            ImageList = DownloadService.DownloadFailImages;
-            _imagePageList = DownloadService.UnAvailablePages;
+            ImageList = ImageDownloadService.DownloadFailImages;
+            _imagePageList = ImageDownloadService.UnAvailablePages;
             this.DataContext = this;
         }
 
@@ -64,7 +64,7 @@ namespace EhentaiDownloader.Views
             new Window_SetTimeOut().ShowDialog();
             isRetry = true;
             this.Close();
-            DownloadService.ReTryAsync();
+            ImageDownloadService.ReTryAsync();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)

@@ -15,7 +15,7 @@ using EhentaiDownloader.Exceptions;
 
 namespace EhentaiDownloader.Parsers
 {
-    public class ShzxParser : IWebpageParser
+    public class ShzxParser : IImageParser
     {
         //static string albumTitle;
         public async Task<List<ImagePageModel>> FindImagePageUrl(TaskItem taskItem)
@@ -59,8 +59,6 @@ namespace EhentaiDownloader.Parsers
                 imagePageModels.Add(new ImagePageModel(url, taskItem));
             }
             return imagePageModels;
-
-
 
         }
 

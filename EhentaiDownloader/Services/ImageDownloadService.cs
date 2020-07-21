@@ -21,13 +21,13 @@ using System.Windows.Media;
 
 namespace EhentaiDownloader.Services
 {
-    class DownloadService
+    class ImageDownloadService
     {
         public static int ParallelTaskNum { get; set; } = 10;
         public static List<ImageModel> DownloadFailImages { get; set; } = new List<ImageModel>();
         public static List<ImageModel> DownloadFinishImages { get; set; } = new List<ImageModel>();
         public static List<ImagePageModel> UnAvailablePages { get; set; } = new List<ImagePageModel>();
-        private static IWebpageParser webpageParser;
+        private static IImageParser webpageParser;
 
         public static async Task StartDownload(ObservableCollection<TaskItem> taskItems)
         {

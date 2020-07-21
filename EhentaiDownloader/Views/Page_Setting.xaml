@@ -1,0 +1,32 @@
+﻿<Page x:Class="EhentaiDownloader.Views.Page_Setting"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:EhentaiDownloader.Views"
+      xmlns:converters="clr-namespace:EhentaiDownloader.Converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SettingPage">
+
+    <Page.Resources>
+
+        <!--设置面板中CheckBox转Bool-->
+        <converters:CheckBoxBoolConverter x:Key="CheckBoxConverter"/>
+    </Page.Resources>
+    <Grid>
+        <StackPanel Margin="8">
+            <TextBlock Style="{StaticResource TextBlock_ElementTitle}"
+                           Text="Http TimeOut (s)"/>
+            <TextBox HorizontalAlignment="Stretch" Text="{Binding TimeOut}" FontSize="18"/>
+            <TextBlock Style="{StaticResource TextBlock_ElementTitle}"
+                           Text="Sound Notification"/>
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="On" GroupName="SoundSelection"
+                                 IsChecked="{Binding IsSoundOn }"/>
+                <RadioButton Content="Off" Margin="8,0" GroupName="SoundSelection" 
+                                 IsChecked="{Binding IsSoundOn, Converter={StaticResource CheckBoxConverter}}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -17,7 +17,7 @@ using EhentaiDownloader.Parsers;
 
 namespace EhentaiDownloader.Tools
 {
-    class EHentaiParser : IWebpageParser
+    class EHentaiParser : IImageParser
     {
         //private static string albumTitle;
 
