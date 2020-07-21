@@ -9,7 +9,7 @@ namespace EhentaiDownloader.Parsers
 {
     interface IEbookParser
     {
-        Task<List<WebPageModel>> FindEbookPage(string url);
-        Task<List<EbookModel>> FindEbookUrl(WebPageModel webPageModel);
+        Task<List<EbookPageModel>> FindEbookPage(string url);
+        Task<EbookPageModel> FindEbookUrl(EbookPageModel webPageModel);
     }
 }

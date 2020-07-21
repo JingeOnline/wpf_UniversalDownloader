@@ -15,7 +15,7 @@ namespace EhentaiDownloader.Parsers
     class AllitebooksParser : IEbookParser
     {
 
-        public async Task<List<WebPageModel>> FindEbookPage(string url)
+        public async Task<List<EbookPageModel>> FindEbookPage(string url)
         {
             string html;
             try
@@ -33,13 +33,13 @@ namespace EhentaiDownloader.Parsers
             {
                 throw new TargetNotFindException("无法在HTML中找到h2.entry-title");
             }
-            List<WebPageModel> webPageModels = new List<WebPageModel>();
+            List<EbookPageModel> webPageModels = new List<EbookPageModel>();
             try
             {
                 foreach (IElement element in urlElements)
                 {
                     string bookPageUrl = element.QuerySelector("a").GetAttribute("href");
-                    webPageModels.Add(new WebPageModel(bookPageUrl));
+                    webPageModels.Add(new EbookPageModel(bookPageUrl));
                     Debug.WriteLine("成功:找到pageurl=" + bookPageUrl);
                 }
             }
@@ -51,9 +51,9 @@ namespace EhentaiDownloader.Parsers
             return webPageModels;
         }
 
-        public async Task<List<EbookModel>> FindEbookUrl(WebPageModel webPageModel)
+        public async Task<EbookPageModel> FindEbookUrl(EbookPageModel webPageModel)
         {
-            List<EbookModel> ebooks = new List<EbookModel>();
+            
 
             string html;
             try
@@ -78,26 +78,41 @@ namespace EhentaiDownloader.Parsers
             IEnumerable<IElement> authorsElements= terms.ElementAt(0).QuerySelectorAll("a");
             webPageModel.Author = string.Join(";", authorsElements.Select(x => x.InnerHtml));
             webPageModel.ISBN = terms.ElementAt(1).InnerHtml;
-            webPageModel.Year = terms.ElementAt(2).InnerHtml;
-            webPageModel.Pages = terms.ElementAt(3).InnerHtml;
+            webPageModel.Year = Int32.Parse( terms.ElementAt(2).InnerHtml);
+            webPageModel.Pages = Int32.Parse(terms.ElementAt(3).InnerHtml);
             webPageModel.Language = terms.ElementAt(4).InnerHtml;
             webPageModel.FileSize = terms.ElementAt(5).InnerHtml;
-            webPageModel.FileFormat = terms.ElementAt(6).InnerHtml;
+            //webPageModel.FileFormat = terms.ElementAt(6).InnerHtml;
             IEnumerable<IElement> tagElements = terms.ElementAt(7).QuerySelectorAll("a");
             webPageModel.Category = string.Join(";", tagElements.Select(x => x.InnerHtml));
-            webPageModel.Description = document.QuerySelector("div.entry-content").TextContent;
+            webPageModel.Description = document.QuerySelector("div.entry-content").InnerHtml;
+            webPageModel.Title = document.QuerySelector("h1.single-title").InnerHtml;
+            IElement subTitleElement = document.QuerySelector("h4");
+            if (subTitleElement != null)
+            {
+            webPageModel.SubTitle = subTitleElement.InnerHtml;
+            }
 
-            int i = 0;
+            IElement imageElement = document.QuerySelector("header.entry-header");
+            IElement imageElement1=imageElement.QuerySelector("img");
+            string imageUrl = imageElement1.GetAttribute("src");
+            string fileUniqueName = TimeHelper.GetTimeStamp();
+            webPageModel.Image = new EbookImageModel(fileUniqueName, imageUrl);
+
+            List<EbookFileModel> ebooks = new List<EbookFileModel>();
+            int i = 1;
             foreach (Element downloadLinkElement in downloadLinkElements)
             {
                 string url = downloadLinkElement.QuerySelector("a").GetAttribute("href");
-                string fileName = TimeHelper.GetTimeStamp() + i;
-                ebooks.Add(new EbookModel(webPageModel, url, fileName));
+                string fileName = fileUniqueName +"_"+ i;
+                ebooks.Add(new EbookFileModel(webPageModel, url, fileName));
                 i++;
-                Debug.WriteLine("fileName=" + fileName);
+                //Debug.WriteLine("fileName=" + fileName);
             }
 
-            return ebooks;
+            webPageModel.EBooks = ebooks;
+
+            return webPageModel;
         }
     }
 }

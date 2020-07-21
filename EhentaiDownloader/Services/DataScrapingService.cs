@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using AngleSharp;
+using EhentaiDownloader.DataBaseService;
 using EhentaiDownloader.Models;
 using EhentaiDownloader.Parsers;
 using EhentaiDownloader.Tools;
@@ -20,26 +22,19 @@ namespace EhentaiDownloader.Services
 
         public static async Task StartDownload(string url1, string url2)
         {
-            List<string> titles = new List<string>()
-            {
-                "FileName","FileSavePath","DownloadUrl",
-                "Title","SubTitle","Author","ISBN","Year","Pages",
-                "Language","FileSize","FileFormat","Category","Description"
-            };
-            await CsvHelper.CreateCsvAsync(titles);
             parser = new AllitebooksParser();
             List<string> pageList = buildAllUrls(url1, url2);
 
-            List<WebPageModel> webPages = new List<WebPageModel>();
+            List<EbookPageModel> webPages = new List<EbookPageModel>();
             foreach (string pageUrl in pageList)
             {
                 webPages.AddRange(await parser.FindEbookPage(pageUrl));
                 Debug.WriteLine(webPages.Count());
             }
 
-            foreach (WebPageModel webPage in webPages)
+            foreach (EbookPageModel webPage in webPages)
             {
-                Debug.WriteLine("-----------");
+                Debug.WriteLine($"------开始尝试解析下载{webPage.Url}-----");
                 await ParseAndDownload(webPage);
             }
 
@@ -51,36 +46,79 @@ namespace EhentaiDownloader.Services
             Debug.WriteLine("Finish");
         }
 
-        private static async Task ParseAndDownload(WebPageModel webpage)
+        static int RecordCount = 0;
+        static int DownloadFileCount = 0;
+
+        private static async Task ParseAndDownload(EbookPageModel webpage)
         {
-            List<EbookModel> ebooks = await parser.FindEbookUrl(webpage);
-            foreach (EbookModel ebook in ebooks)
+            EbookPageModel page = await parser.FindEbookUrl(webpage);
+            //下载图书文件
+            int success = 0;
+            foreach (EbookFileModel ebook in page.EBooks)
             {
                 try
                 {
                     byte[] file = await HttpDownloader.DownloadBytes(ebook.DownloadUrl);
                     FileWriter.WriteToFile(file, ebook.FileSavePath);
-                    List<string> fields = new List<string>()
-                        {
-                        ebook.FileName,ebook.FileSavePath,ebook.DownloadUrl,
-                        ebook.WebPageModel.Title,ebook.WebPageModel.SubTitle,ebook.WebPageModel.Author,
-                        ebook.WebPageModel.ISBN,ebook.WebPageModel.Year,ebook.WebPageModel.Pages,
-                        ebook.WebPageModel.Language,ebook.WebPageModel.FileSize,
-                        ebook.WebPageModel.FileFormat,ebook.WebPageModel.Category,ebook.WebPageModel.Description
-                        };
-                    CsvHelper.AppendToCsv(fields);
+                    success++;
+                    ebook.IsDownloaded = true;
+                    DownloadFileCount++;
+                    Debug.WriteLine("下载文件数量=" + DownloadFileCount);
                 }
                 catch (TaskCanceledException)
                 {
-                    Debug.WriteLine("下载文件超时");
+                    Debug.WriteLine("下载图书文件超时");
+                    continue;
+                }
+                catch(HttpRequestException e)
+                {
+                    Debug.WriteLine("访问图书下载连接失败：" + e.Message);
                     continue;
                 }
                 catch(Exception e)
                 {
                     Debug.WriteLine(e.Message);
+                    continue;
                 }
-
             }
+            if (success == 0)
+            {
+                return;
+            }
+            //下载图书图片
+            try
+            {
+                byte[] imageBytes = await HttpDownloader.DownloadBytes(page.Image.ImageUrl);
+                FileWriter.WriteToFile(imageBytes, page.Image.ImageSavePath);
+                //如果图片下载成功，则填入地址，失败则为null
+                page.ImagePath = page.Image.ImageSavePath;
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("下载图片超时");
+            }
+            catch (HttpRequestException e)
+            {
+                Debug.WriteLine("访问图片连接失败：" + e.Message);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            //添加对象属性
+            page.FilePaths = string.Join(", ", page.EBooks.Where(x=>x.IsDownloaded).Select(x => x.FileSavePath));
+            page.FileFormat = string.Join(", ", page.EBooks.Where(x => x.IsDownloaded).Select(x => x.FileExtention));
+            page.FileCount = page.EBooks.Where(x => x.IsDownloaded).Count();
+            //写入数据库
+            using (var db=new MyAppDbContext())
+            {
+                db.Blogs.Add(page);
+                db.SaveChanges();
+                RecordCount++;
+                Debug.WriteLine("写入记录条数=" + RecordCount);
+            }
+
         }
 
 

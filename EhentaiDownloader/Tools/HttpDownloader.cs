@@ -16,7 +16,7 @@ namespace EhentaiDownloader.Tools
         //private static HttpClient httpClient = new HttpClient();
         private static HttpClient httpClient;
 
-        private static TimeSpan timeOut = new TimeSpan(0, 0, 30);
+        private static TimeSpan timeOut = new TimeSpan(0, 0, 60);
         public static void SetTimeOut(int second)
         {
             timeOut = new TimeSpan(0,0,second);

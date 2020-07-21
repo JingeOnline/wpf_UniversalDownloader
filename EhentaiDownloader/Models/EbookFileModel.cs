@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace EhentaiDownloader.Models
 {
-    public class EbookModel
+    public class EbookFileModel
     {
 
         public string DownloadUrl { get; set; }
-        public WebPageModel WebPageModel{get;set; }
+        //public EbookPageModel WebPageModel{get;set; }
         public string ErrorMessage { get; set; }
+        public bool IsDownloaded { get; set; } = false;
         public string FileName { get; set; }
         public string FileSavePath 
         {
@@ -35,9 +36,9 @@ namespace EhentaiDownloader.Models
             }
         }
 
-        public EbookModel(WebPageModel webPageModel,string downloadUrl, string fileName)
+        public EbookFileModel(EbookPageModel webPageModel,string downloadUrl, string fileName)
         {
-            this.WebPageModel = webPageModel;
+            //this.WebPageModel = webPageModel;
             this.DownloadUrl = downloadUrl;
             this.FileName = fileName;
         }

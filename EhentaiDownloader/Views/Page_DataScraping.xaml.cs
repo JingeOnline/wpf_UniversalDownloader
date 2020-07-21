@@ -48,7 +48,7 @@ namespace EhentaiDownloader.Views
             set { _saveFolder = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<EbookModel> BookCollection { get; set; } = new ObservableCollection<EbookModel>();
+        public ObservableCollection<EbookFileModel> BookCollection { get; set; } = new ObservableCollection<EbookFileModel>();
 
         public Page_DataScraping()
         {
