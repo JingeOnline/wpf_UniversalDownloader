@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EhentaiDownloader.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,7 @@ namespace EhentaiDownloader.Delegates
         public static Action<int> SetImageDownloadFailCountCommand { get; set; }
         public static Action<long> AddImageDownloadSizeCommand { get; set; }
         public static Action<int> SetUnavailableImagePageCountCommand { get; set; }
+        public static Action<EbookPageModel> AddToEbookCollection { get; set; }
+        //public static Action<List<EbookPageModel>> AddRangeToEbookCollection { get; set; }
     }
 }

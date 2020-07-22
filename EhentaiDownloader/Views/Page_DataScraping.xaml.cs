@@ -48,7 +48,7 @@ namespace EhentaiDownloader.Views
             set { _saveFolder = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<EbookFileModel> BookCollection { get; set; } = new ObservableCollection<EbookFileModel>();
+        public ObservableCollection<EbookPageModel> EBookCollection { get; set; } = new ObservableCollection<EbookPageModel>();
 
         public Page_DataScraping()
         {
@@ -87,6 +87,7 @@ namespace EhentaiDownloader.Views
         {
             //DelegateCommands.ClearAllCommand = ClearAll;
             DelegateCommands.GetFolderPathCommand = () => SaveFolder;
+            DelegateCommands.AddToEbookCollection = (x) => EBookCollection.Add(x);
             //DelegateCommands.SetImageDownloadCountCommand = (x) => ImageDownloadCount = x;
             //DelegateCommands.SetImageDownloadFailCountCommand = (x) => ImageDownloadFailCount = x;
             //DelegateCommands.AddImageDownloadSizeCommand = (x) => ImageDownloadSize += x;

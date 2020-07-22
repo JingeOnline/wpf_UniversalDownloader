@@ -21,7 +21,7 @@
             <TextBlock Text="To:" Style="{StaticResource TextBlock_ElementTitle}"/>
             <TextBox FontSize="18" Text="{Binding UrlInput2,Mode=TwoWay}"/>
         </StackPanel>
-        <DataGrid Grid.Row="1" Margin="8,8,8,8">
+        <DataGrid Grid.Row="1" Margin="8,8,8,8" ItemsSource="{Binding EBookCollection,Mode=OneWay}">
             
         </DataGrid>
         <Grid Grid.Row="2" Margin="8,0,8,8">

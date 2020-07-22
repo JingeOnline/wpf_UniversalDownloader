@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using AngleSharp;
 using EhentaiDownloader.DataBaseService;
+using EhentaiDownloader.Delegates;
 using EhentaiDownloader.Models;
 using EhentaiDownloader.Parsers;
 using EhentaiDownloader.Tools;
@@ -30,6 +31,10 @@ namespace EhentaiDownloader.Services
             {
                 webPages.AddRange(await parser.FindEbookPage(pageUrl));
                 Debug.WriteLine(webPages.Count());
+                foreach(EbookPageModel page in webPages)
+                {
+                    DelegateCommands.AddToEbookCollection?.Invoke(page);
+                }
             }
 
             foreach (EbookPageModel webPage in webPages)
@@ -111,13 +116,13 @@ namespace EhentaiDownloader.Services
             page.FileFormat = string.Join(", ", page.EBooks.Where(x => x.IsDownloaded).Select(x => x.FileExtention));
             page.FileCount = page.EBooks.Where(x => x.IsDownloaded).Count();
             //写入数据库
-            using (var db=new MyAppDbContext())
-            {
-                db.Blogs.Add(page);
-                db.SaveChanges();
-                RecordCount++;
-                Debug.WriteLine("写入记录条数=" + RecordCount);
-            }
+            //using (var db=new MyAppDbContext())
+            //{
+            //    db.Blogs.Add(page);
+            //    db.SaveChanges();
+            //    RecordCount++;
+            //    Debug.WriteLine("写入记录条数=" + RecordCount);
+            //}
 
         }
 
