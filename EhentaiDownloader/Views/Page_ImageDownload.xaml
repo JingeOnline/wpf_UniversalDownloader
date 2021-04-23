@@ -50,8 +50,9 @@
                     <ComboBoxItem Content="查找多条Url"/>
                     <ComboBoxItem Content="SHZX相册页解析"/>
                 </ComboBox>
-                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}"
-                         TextWrapping="Wrap" AcceptsReturn="True" MaxHeight="64" VerticalScrollBarVisibility="Auto"/>
+                <TextBox Margin="0,0,8,0" FontSize="18" VerticalAlignment="Center" Text="{Binding UrlInput}" 
+                         TextWrapping="Wrap" AcceptsReturn="True" MaxHeight="64" VerticalScrollBarVisibility="Auto"
+                         x:Name="TextBox_UrlInput"/>
             </DockPanel>
             <!--下载列表DataGird-->
             <DataGrid Grid.Row="1" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False"

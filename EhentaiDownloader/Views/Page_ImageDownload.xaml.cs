@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Configuration;
 
 namespace EhentaiDownloader.Views
 {
@@ -37,11 +38,21 @@ namespace EhentaiDownloader.Views
         }
         //一定要绑定属性，而不能是字段，public字段也不行。
         public ObservableCollection<TaskItem> DownloadTaskCollection { get; set; } = new ObservableCollection<TaskItem>();
-        private string _saveFolder = @"C:\Users\jinge\Pictures\hentai";
+        private string _saveFolder = @"C:\Users\jinge\Pictures";
         public string SaveFolder
         {
             get { return _saveFolder; }
-            set { _saveFolder = value; OnPropertyChanged(); }
+            set
+            {
+                if (value != _saveFolder)
+                {
+                    Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                    cfa.AppSettings.Settings["OutputFolder"].Value = value;
+                    cfa.Save();
+                }
+                _saveFolder = value;
+                OnPropertyChanged();
+            }
         }
         private int _imageDownloadCount;
         public int ImageDownloadCount
@@ -97,18 +108,40 @@ namespace EhentaiDownloader.Views
         {
             InitializeComponent();
             this.DataContext = this;
+            InitialOutputPath();
+        }
+
+        public void InitialOutputPath()
+        {
+            string outpath = ConfigurationManager.AppSettings["OutputFolder"];
+            if (!string.IsNullOrEmpty(outpath))
+            {
+                SaveFolder = outpath;
+            }
         }
 
         private void Button_Add_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(UrlInput))
+            {
+                TextBox_UrlInput.Focus();
+                return;
+            }
+            if (DownloadTaskCollection.Any(x => x.Url == UrlInput))
+            {
+                TextBox_UrlInput.Focus();
+                return;
+            }
             addUserInputToTaskList(UrlInput);
             UrlInput = string.Empty;
+            TextBox_UrlInput.Focus();
         }
 
         private async void Button_Start_Click(object sender, RoutedEventArgs e)
         {
             registerCommands();
             await ImageDownloadService.StartDownload(DownloadTaskCollection);
+            TextBox_UrlInput.Focus();
         }
 
         private void Button_SaveTo_Click(object sender, RoutedEventArgs e)
