@@ -56,7 +56,8 @@
             </DockPanel>
             <!--下载列表DataGird-->
             <DataGrid Grid.Row="1" Margin="0,8" ItemsSource="{Binding DownloadTaskCollection, Mode=TwoWay}" AutoGenerateColumns="False"
-                      x:Name="DataGrid_Tasks" LoadingRow="DataGrid_Tasks_LoadingRow">
+                      x:Name="DataGrid_Tasks" LoadingRow="DataGrid_Tasks_LoadingRow"
+                      AlternatingRowBackground="LightGray"   AlternationCount="2">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn >
                         <DataGridTemplateColumn.Header>
