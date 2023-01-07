@@ -221,7 +221,8 @@ namespace EhentaiDownloader.Views
                 addUserInputToTaskList = async (s) =>
                 {
                     List<string> urls = await new ShzxParser_ParentParser().Parse(s);
-                    foreach (string url in urls)
+                    IEnumerable<string> removeDuplicateUrls = urls.Distinct();
+                    foreach (string url in removeDuplicateUrls)
                     {
                         DownloadTaskCollection.Add(new TaskItem(url));
                     }

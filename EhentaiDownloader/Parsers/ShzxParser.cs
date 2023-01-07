@@ -92,6 +92,13 @@ namespace EhentaiDownloader.Parsers
             {
                 string imageName;
                 string url = imgElement.GetAttribute("src");
+                //如果URL不是完整的URL，把https:加上
+                if(url.Length>2 && url[0]=='/' && url[1]=='/')
+                {
+                    url = "https:" + url;
+                }
+                //----------------------------------
+
                 if (index > 0)
                 {
                     imageName = albumTitle + "_" + pageNum + "_" + index;

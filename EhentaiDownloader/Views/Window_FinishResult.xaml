@@ -24,7 +24,7 @@
                 <Run Text="Webpages are not available:"/>
                 <Run Text="{Binding ElementName=DataGrid_1,Path=Items.Count, Mode=OneWay}"/>
             </TextBlock>
-            <DataGrid Grid.Row="1" ItemsSource="{Binding ImagePageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_1"/>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ImagePageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_1" SelectionUnit="Cell"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
@@ -35,7 +35,7 @@
                 <Run Text="Images fail to download:" />
                 <Run Text="{Binding ElementName=DataGrid_2,Path=Items.Count, Mode=OneWay}"/>
             </TextBlock>
-            <DataGrid Grid.Row="1" ItemsSource="{Binding ImageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_2"/>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ImageList,Mode=OneWay}" AutoGenerateColumns="True" x:Name="DataGrid_2" SelectionUnit="Cell"/>
         </Grid>
         <Grid Grid.Row="3" Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
