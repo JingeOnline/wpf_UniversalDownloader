@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using AngleSharp;
-using EhentaiDownloader.DataBaseService;
+//using EhentaiDownloader.DataBaseService;
 using EhentaiDownloader.Delegates;
 using EhentaiDownloader.Models;
 using EhentaiDownloader.Parsers;

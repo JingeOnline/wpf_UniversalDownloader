@@ -98,14 +98,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\CheckBoxBoolConverter.cs" />
-    <Compile Include="DataBaseService\MyAppDbContext.cs" />
     <Compile Include="Delegates\DelegateCommands.cs" />
     <Compile Include="Exceptions\TargetNotFindException.cs" />
-    <Compile Include="Migrations\202007211346520_InitialDatabase.cs" />
-    <Compile Include="Migrations\202007211346520_InitialDatabase.designer.cs">
-      <DependentUpon>202007211346520_InitialDatabase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\EbookFileModel.cs" />
     <Compile Include="Models\EbookImageModel.cs" />
     <Compile Include="Models\ImageModel.cs" />
@@ -188,9 +182,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\202007211346520_InitialDatabase.resx">
-      <DependentUpon>202007211346520_InitialDatabase.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
